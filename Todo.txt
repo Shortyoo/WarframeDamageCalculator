@@ -1,0 +1,3 @@
+- Apply Status Procs and Calcualte with them (i.e. Shotgun: First projectile applies Corrosive Proc -> all other projetiles shall make more damage then)
+- Easier way to define weapons
+- Maybe extract a list of weapons by Warframe.fandom? 
