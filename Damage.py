@@ -1,6 +1,7 @@
 from Weapon import Weapon
 from DamageTypes import DamageTypes
 from Enemy import Enemy
+from Armor import Armor
 
 class Damage:
     def __init__(self, weapon: Weapon, enemy: Enemy):
@@ -8,9 +9,13 @@ class Damage:
         self.enemy = enemy
 
     def DamageModifier(self, str):
-        armorReduction = 0 # we are not counting in corrosive procs so for
+        # https://warframe.fandom.com/wiki/Damage/Corrosive_Damage
+        corrProcs = self.CalculateCorrosiveProcs()
+        armorValue = self.enemy.Armor * (1 - corrProcs)
+
         headshot = 1 # we aim for the head
-        return (300 / (300 + self.enemy.armor.ArmorMultiplier[str] * (1 - armorReduction))) * (1 + armorReduction) * (1 + self.enemy.health.HealthMultiplier[str]) * (1 + (self.weapon.stats.Damage["CritChance"] * self.weapon.stats.Damage["CritDamage"])) * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + headshot)
+        # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
+        return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[str]))) * (1 + self.enemy.armor.ArmorMultiplier[str]) * (1 + self.enemy.health.HealthMultiplier[str]) * (1 + (self.weapon.stats.Damage["CritChance"] * self.weapon.stats.Damage["CritDamage"])) * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + headshot)
 
     def CalculateSingleshot(self):
         self.singleDamage = {}
@@ -22,3 +27,15 @@ class Damage:
 
     def CalculateMultishot(self):
         return self.CalculateSingleshot() * self.weapon.stats.Damage["Multishot"]
+
+    def CalculateCorrosiveProcs(self):
+        armorReduction = 0
+        procs = self.weapon.CalculateProcs()
+
+        if "Corrosive" in procs:
+            if procs["Corrosive"] > 1:
+                armorReduction = 0.26 + procs["Corrosive"] * 0.06
+                if armorReduction > 0.8:
+                    armorReduction = 0.8
+
+        return armorReduction

@@ -21,8 +21,8 @@ class Weapon:
 
         # Add and sum toxin, slash and stuff
         for entry in DamageTypes().Damage:
-            if self.stats.Damage[entry] > 0:
-                self.stats.Damage[entry] = self.stats.Damage[entry] + (self.UnmoddedDamage * mods.Multiplier[entry] * (1+mods.Multiplier["BaseDamage"]))
+            #if self.stats.Damage[entry] > 0:
+            self.stats.Damage[entry] = self.stats.Damage[entry] + (self.UnmoddedDamage * mods.Multiplier[entry] * (1 + mods.Multiplier["BaseDamage"]))
 
     def ModdedBaseDamage(self):
         damage = 0
@@ -39,5 +39,22 @@ class Weapon:
         for entry in DamageTypes().Multiplier:
             if entry == "BaseDamage":
                 continue
-            string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 2)) + "\r\n"
+            string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
         return string
+
+    def CalculateProcs(self):
+        probability = {}
+        for entry in DamageTypes().Damage:
+            if self.stats.Damage[entry] > 0:
+                probability[entry] = 0
+
+        # iterate through all possibilities
+        for key in probability.keys():
+            probability[key] = self.stats.Damage[key] / self.ModdedBaseDamage()
+
+        return probability
+
+    def CalculateSlashDamage(self):
+        baseSlash = self.stats.Damage["Slash"]
+        baseSlash = baseSlash * self.stats.Damage["FactionDamage"]
+        print("baseSlash: " + str(baseSlash))
