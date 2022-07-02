@@ -5,11 +5,39 @@ from DamageTypes import DamageTypes
 class Weapon:
     def __init__(self, baseStats: Stats, mods: Mods):
         self.stats = Stats()
-        for entry in DamageTypes().Multiplier:
-            self.stats.Damage[entry] = round(baseStats.Damage[entry] * mods.Multiplier[entry] * mods.Multiplier["BaseDamage"], 1)
+        self.BaseDamage = 0
+        self.UnmoddedDamage = 0
 
-        self.stats.Damage.pop("BaseDamage")
-        self.Quantum = (baseStats.BaseDamage() * mods.Multiplier["BaseDamage"]) / 16
+        for entry in DamageTypes().Damage:
+            self.UnmoddedDamage = self.UnmoddedDamage + baseStats.Damage[entry]
+
+        # Set the base damage
+        for entry in DamageTypes().Damage:
+            self.stats.Damage[entry] = round(baseStats.Damage[entry] * (1 + mods.Multiplier["BaseDamage"]), 1)
+            self.BaseDamage = self.BaseDamage + self.stats.Damage[entry]
+
+        for entry in DamageTypes().Additionals:
+            self.stats.Damage[entry] = round(baseStats.Damage[entry] * (1 + mods.Multiplier[entry]), 1)
+
+        # Add and sum toxin, slash and stuff
+        for entry in DamageTypes().Damage:
+            if self.stats.Damage[entry] > 0:
+                self.stats.Damage[entry] = self.stats.Damage[entry] + (self.UnmoddedDamage * mods.Multiplier[entry] * (1+mods.Multiplier["BaseDamage"]))
+
+    def ModdedBaseDamage(self):
+        damage = 0
+        for entry in DamageTypes().Damage:
+            damage = damage + self.stats.Damage[entry]
+        return damage
 
     def QuantizedDamageType(self, type: str):
+        self.Quantum = self.ModdedBaseDamage() / 16
         return round(self.stats.Damage[type] / self.Quantum, 0) * self.Quantum
+
+    def ShowStats(self):
+        string = ""
+        for entry in DamageTypes().Multiplier:
+            if entry == "BaseDamage":
+                continue
+            string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 2)) + "\r\n"
+        return string
