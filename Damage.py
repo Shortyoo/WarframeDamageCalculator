@@ -15,7 +15,7 @@ class Damage:
 
         headshot = 1 # we aim for the head
         # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
-        return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[str]))) * (1 + self.enemy.armor.ArmorMultiplier[str]) * (1 + self.enemy.health.HealthMultiplier[str]) * (1 + (self.weapon.stats.Damage["CritChance"] * self.weapon.stats.Damage["CritDamage"])) * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + headshot)
+        return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[str]))) * (1 + self.enemy.armor.ArmorMultiplier[str]) * (1 + self.enemy.health.HealthMultiplier[str]) * (1 + ((self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"])) * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + headshot)
 
     def CalculateSingleshot(self):
         self.singleDamage = {}

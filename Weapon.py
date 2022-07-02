@@ -55,6 +55,6 @@ class Weapon:
         return probability
 
     def CalculateSlashDamage(self):
-        baseSlash = self.stats.Damage["Slash"]
-        baseSlash = baseSlash * self.stats.Damage["FactionDamage"]
+        headshot = 1 # we aim for the head
+        baseSlash = 0.35 * self.stats.Damage["Slash"] * (1 + self.stats.Damage["FactionDamage"])* (1 + (self.stats.Damage["CritChance"] / 100) * self.stats.Damage["CritDamage"]) * (1 + headshot)
         print("baseSlash: " + str(baseSlash))
