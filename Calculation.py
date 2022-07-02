@@ -4,6 +4,7 @@ from Stats import Stats
 from Mods import Mods
 from Health import Health
 from Damage import Damage
+from Enemy import Enemy
 
 mods = Mods()
 mods.Multiplier["BaseDamageMultiplier"] = 2.65 # Point Blank
@@ -20,7 +21,7 @@ hek.Damage["Multishot"] = 7
 hek.Damage["StatusChance"] = 13.33
 hek.Damage["CritChance"] = 23
 hek.Damage["CritDamage"] = 2.1
-hek.Damage["Corrosive"] = 0
+hek.Damage["Corrosive"] = 52.2
 
 
 strun = Stats()
@@ -48,8 +49,10 @@ gunnerHealth.HealthMultiplier["Viral"] = 0.75
 HekWeap = Weapon(hek, mods)
 StrunWeap = Weapon(strun, mods)
 
-hekDmg = Damage(HekWeap, gunnerArmor, gunnerHealth)
-strunDmg = Damage(StrunWeap, gunnerArmor, gunnerHealth)
+gunner = Enemy(gunnerArmor, gunnerHealth)
+
+hekDmg = Damage(HekWeap, gunner)
+strunDmg = Damage(StrunWeap, gunner)
 
 print("Hek Projectile: "+str(hekDmg.CalculateSingleshot()))
 print("Hek Multishot: " +str(hekDmg.CalculateMultishot()))
