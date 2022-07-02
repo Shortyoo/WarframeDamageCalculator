@@ -83,7 +83,7 @@ sarpaDmg = Damage(SarpaWeap, gunner)
 #print("Sarpa Stats: \n" + SarpaWeap.ShowStats())
 
 procs = SarpaWeap.CalculateProcs()
-SarpaWeap.CalculateSlashDamage()
+sarpaDmg.CalculateSlashDamage()
 
 print("Hek Projectile: "+format(hekDmg.CalculateSingleshot(), ",f"))
 print("Hek Multishot: " +format(hekDmg.CalculateMultishot(), ",f"))

@@ -39,3 +39,9 @@ class Damage:
                     armorReduction = 0.8
 
         return armorReduction
+
+
+    def CalculateSlashDamage(self):
+        headshot = 1 # we aim for the head
+        baseSlash = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot)
+        print("baseSlash: " + str(baseSlash))

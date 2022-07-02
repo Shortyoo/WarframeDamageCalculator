@@ -53,8 +53,3 @@ class Weapon:
             probability[key] = self.stats.Damage[key] / self.ModdedBaseDamage()
 
         return probability
-
-    def CalculateSlashDamage(self):
-        headshot = 1 # we aim for the head
-        baseSlash = 0.35 * self.stats.Damage["Slash"] * (1 + self.stats.Damage["FactionDamage"])* (1 + (self.stats.Damage["CritChance"] / 100) * self.stats.Damage["CritDamage"]) * (1 + headshot)
-        print("baseSlash: " + str(baseSlash))
