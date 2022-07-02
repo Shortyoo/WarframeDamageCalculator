@@ -7,11 +7,11 @@ from Damage import Damage
 from Enemy import Enemy
 
 mods = Mods()
-mods.Multiplier["BaseDamageMultiplier"] = 2.65 # Point Blank
-mods.Multiplier["CorrosiveMultiplier"] = 1.8 # Contagious Spread + Charged Shell
-mods.Multiplier["CritChanceMultiplier"] = 3 # Critical Deceleration
-mods.Multiplier["CritDamageMultiplier"] = 2.1 # Primed Rabvage
-mods.Multiplier["MultishotMultiplier"] = 3.3 # Full stacked Galvanized Hell
+mods.Multiplier["BaseDamage"] = 2.65 # Point Blank
+mods.Multiplier["Corrosive"] = 1.8 # Contagious Spread + Charged Shell
+mods.Multiplier["CritChance"] = 3 # Critical Deceleration + Zephyr passive
+mods.Multiplier["CritDamage"] = 2.1 # Primed Ravage
+mods.Multiplier["Multishot"] = 3.3 # Full stacked Galvanized Hell
 
 hek = Stats()
 hek.Damage["Impact"] = 13.1

@@ -1,0 +1,21 @@
+[1mdiff --git a/Calculation.py b/Calculation.py[m
+[1mindex 9e53e72..c88970a 100644[m
+[1m--- a/Calculation.py[m
+[1m+++ b/Calculation.py[m
+[36m@@ -7,11 +7,11 @@[m [mfrom Damage import Damage[m
+ from Enemy import Enemy[m
+ [m
+ mods = Mods()[m
+[31m-mods.Multiplier["BaseDamageMultiplier"] = 2.65 # Point Blank[m
+[31m-mods.Multiplier["CorrosiveMultiplier"] = 1.8 # Contagious Spread + Charged Shell[m
+[31m-mods.Multiplier["CritChanceMultiplier"] = 3 # Critical Deceleration[m
+[31m-mods.Multiplier["CritDamageMultiplier"] = 2.1 # Primed Rabvage[m
+[31m-mods.Multiplier["MultishotMultiplier"] = 3.3 # Full stacked Galvanized Hell[m
+[32m+[m[32mmods.Multiplier["BaseDamage"] = 2.65 # Point Blank[m
+[32m+[m[32mmods.Multiplier["Corrosive"] = 1.8 # Contagious Spread + Charged Shell[m
+[32m+[m[32mmods.Multiplier["CritChance"] = 3 # Critical Deceleration + Zephyr passive[m
+[32m+[m[32mmods.Multiplier["CritDamage"] = 2.1 # Primed Ravage[m
+[32m+[m[32mmods.Multiplier["Multishot"] = 3.3 # Full stacked Galvanized Hell[m
+ [m
+ hek = Stats()[m
+ hek.Damage["Impact"] = 13.1[m
