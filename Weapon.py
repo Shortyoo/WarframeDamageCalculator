@@ -4,7 +4,8 @@ from DamageTypes import DamageTypes
 
 class Weapon:
     def __init__(self, baseStats: Stats, mods: Mods):
-        self.stats = Stats()
+        self.stats = Stats("")
+        self.Name = baseStats.Name
         self.BaseDamage = 0
         self.UnmoddedDamage = 0
 

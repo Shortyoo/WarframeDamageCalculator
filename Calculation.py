@@ -7,49 +7,37 @@ from Damage import Damage
 from Enemy import Enemy
 from DamageTypes import DamageTypes
 import configparser
+import sys
 
-config = configparser.ConfigParser()
-config.read("Modconfig.ini")
+def loadWeapon(name: str):
+    weaponParser = configparser.ConfigParser()
+    weaponParser.read("Weapons/"+name+".ini")
+    weaponStats = Stats(name)
+    for entry in DamageTypes().Multiplier:
+        if entry == "BaseDamage" or entry == "FactionDamage":
+            continue
+        weaponStats.Damage[entry] = float(weaponParser["Weapon"][entry])
+    return weaponStats
+
+if len(sys.argv) == 1:
+    print("Usage: python Calculation.py \"WeaponName_1\" \"WeaponName_n\"")
+
+weaponStats = []
+
+for name in sys.argv[1::]:
+    weaponStats.append(loadWeapon(str(name)))
+
+modParser = configparser.ConfigParser()
+modParser.read("Mods/Modconfig_1.ini")
 mods = Mods()
 
 for entry in DamageTypes().Multiplier:
-    mods.Multiplier[entry] = float(config["Mods"][entry])
+    mods.Multiplier[entry] = float(modParser["Mods"][entry])
 
-hek = Stats()
-hek.Damage["Impact"] = 13.1
-hek.Damage["Puncture"] = 56.5
-hek.Damage["Slash"] = 17.4
-hek.Damage["Multishot"] = 7
-hek.Damage["StatusChance"] = 13.33
-hek.Damage["CritChance"] = 23
-hek.Damage["CritDamage"] = 2.1
-hek.Damage["Corrosive"] = 52.2
+weapons = []
+for stat in weaponStats:
+    weapons.append(Weapon(stat, mods))
 
-strun = Stats()
-strun.Damage["Impact"] = 19.8
-strun.Damage["Puncture"] = 6.6
-strun.Damage["Slash"] = 17.6
-strun.Damage["Multishot"] = 12
-strun.Damage["StatusChance"] = 6.7
-strun.Damage["CritChance"] = 24
-strun.Damage["CritDamage"] = 2.2
-
-sarpa = Stats()
-sarpa.Damage["Impact"] = 3.5
-sarpa.Damage["Puncture"] = 10.5
-sarpa.Damage["Slash"] = 21
-sarpa.Damage["Multishot"] = 5
-sarpa.Damage["StatusChance"] = 28
-sarpa.Damage["CritChance"] = 14
-sarpa.Damage["CritDamage"] = 2
-
-
-# Blood Rush
-# Primed Pressure Point
-# Organ Shatter
-# Condition Overload
-# 90 Tox
-# 90 Cold
 
 sarpaMods = Mods()
 sarpaMods.Multiplier["BaseDamage"] = 4.85 # 4x Condition Overload
@@ -70,26 +58,21 @@ gunnerHealth.HealthMultiplier["Heat"] = 0.25
 gunnerHealth.HealthMultiplier["Slash"] = 0.25
 gunnerHealth.HealthMultiplier["Viral"] = 0.75
 
-HekWeap = Weapon(hek, mods)
-StrunWeap = Weapon(strun, mods)
-SarpaWeap = Weapon(sarpa, sarpaMods)
-
 gunner = Enemy(gunnerArmor, gunnerHealth)
 
-hekDmg = Damage(HekWeap, gunner)
-strunDmg = Damage(StrunWeap, gunner)
-sarpaDmg = Damage(SarpaWeap, gunner)
+damage = []
+for weapon in weapons:
+    damage.append(Damage(weapon, gunner))
 
 #print("Hek Stats: \n" + HekWeap.ShowStats())
 #print("Strun Stats: \n" + StrunWeap.ShowStats())
 #print("Sarpa Stats: \n" + SarpaWeap.ShowStats())
 
-procs = SarpaWeap.CalculateProcs()
-sarpaDmg.CalculateSlashDamage()
+#procs = SarpaWeap.CalculateProcs()
+#sarpaDmg.CalculateSlashDamage()
 
-print("Hek Projectile: "+format(hekDmg.CalculateSingleshot(), ",f"))
-print("Hek Multishot: " +format(hekDmg.CalculateMultishot(), ",f"))
-print("Strun Projectile: "+format(strunDmg.CalculateSingleshot(), ",f"))
-print("Strun Multishot: "+format(strunDmg.CalculateMultishot(), ",f"))
-print("Sarpa Projectile: "+format(sarpaDmg.CalculateSingleshot(), ",f"))
-print("Sarpa Multishot: "+format(sarpaDmg.CalculateMultishot(), ",f"))
+for entry in damage:
+    print(entry.weapon.Name + "Projectile: " + format(entry.CalculateSingleshot(), ",f"))
+    print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(), ",f"))
+    if entry.weapon.Name == "Sarpa":
+        entry.CalculateSlashDamage()
