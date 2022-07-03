@@ -5,13 +5,15 @@ from Mods import Mods
 from Health import Health
 from Damage import Damage
 from Enemy import Enemy
+from DamageTypes import DamageTypes
+import configparser
 
+config = configparser.ConfigParser()
+config.read("Modconfig.ini")
 mods = Mods()
-mods.Multiplier["BaseDamage"] = 1.65 # Point Blank
-mods.Multiplier["Corrosive"] = 1.8 # Contagious Spread + Charged Shell
-mods.Multiplier["CritChance"] = 2 # Critical Deceleration + Zephyr passive
-mods.Multiplier["CritDamage"] = 1.1 # Primed Ravage
-mods.Multiplier["Multishot"] = 2.3 # Full stacked Galvanized Hell
+
+for entry in DamageTypes().Multiplier:
+    mods.Multiplier[entry] = float(config["Mods"][entry])
 
 hek = Stats()
 hek.Damage["Impact"] = 13.1
