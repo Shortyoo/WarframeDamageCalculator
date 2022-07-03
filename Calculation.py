@@ -46,13 +46,6 @@ else:
     for i in range(0, len(weaponStatList)):
         weapons.append(Weapon(weaponStatList[i], modStatList[i]))
 
-
-    sarpaMods = Mods()
-    sarpaMods.Multiplier["BaseDamage"] = 4.85 # 4x Condition Overload
-    sarpaMods.Multiplier["CritChance"] = 4.8 # fully stacked blood rush
-    sarpaMods.Multiplier["CritDamage"] = 0.9 # Organ Shatter
-    sarpaMods.Multiplier["Viral"] = 1.8 # 90 Tox 90 Cold
-
     gunnerArmor = Armor()
     gunnerArmor.ArmorMultiplier["Corrosive"] = 0.75
     gunnerArmor.ArmorMultiplier["Puncture"] = 0.5
