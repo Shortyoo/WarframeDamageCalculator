@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-hm", "--hunterMunition", help="Tries to proc HunterMunition on every weapon on every shot", action="store_true")
 parser.add_argument("-sS", "--showStats", help="Shows the stat of each weapon after calculation", action="store_true")
 parser.add_argument("-s", "--slash", help ="Calculates the damage of all slash procs", action="store_true")
+parser.add_argument("-sP", "--showProcs", help ="Calculates the probability to apply a proc on the opponent", action="store_true")
 args = parser.parse_args()
 
 def loadWeapon(name: str):
@@ -87,4 +88,4 @@ else:
 
     if args.showStats:
         for entry in damage:
-            print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats())
+            print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats(args.showProcs, args.hunterMunition))

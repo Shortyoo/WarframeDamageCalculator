@@ -38,7 +38,7 @@ class Weapon:
         self.Quantum = self.ModdedBaseDamage() / 16
         return round(self.stats.Damage[type] / self.Quantum, 0) * self.Quantum
 
-    def ShowStats(self):
+    def ShowStats(self, showProcs: bool, procHunterMunition: bool):
         string = ""
         for entry in DamageTypes().Multiplier:
             if entry == "BaseDamage":
@@ -46,9 +46,15 @@ class Weapon:
             string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
 
         string = string + "\t" + "Approximately " + str(self.stats.Damage["Multishot"] * (self.stats.Damage["StatusChance"] / 100)) + " Status Procs per shot with following probability: \r\n"
-        procs = self.CalculateProcs()
-        for entry in procs.keys():
-            string = string + "\t\t" + entry + ": " + str(procs[entry]) + " = " + str(procs[entry] * self.stats.Damage["Multishot"]) + "\r\n"
+
+        if showProcs:
+            procs = self.CalculateProcs()
+            for entry in procs.keys():
+                string = string + "\t\t" + entry + ": " + str(round(procs[entry], 5)) + " = " + str(round(procs[entry] * self.stats.Damage["Multishot"], 5)) + " Procs\r\n"
+
+        if procHunterMunition:
+            string = string + "\t Hunter Munitions proc " + str(round(self.stats.Damage["Multishot"] * (self.stats.Damage["CritChance"] / 100) * 0.3, 2)) + " times Slash"
+
 
         return string
 
