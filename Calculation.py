@@ -80,3 +80,4 @@ else:
 
     for entry in damage:
         print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats())
+        pass

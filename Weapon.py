@@ -18,7 +18,6 @@ class Weapon:
             self.BaseDamage = self.BaseDamage + self.stats.Damage[entry]
 
         for entry in DamageTypes().Additionals:
-            print(entry + ": "+ str(mods.Multiplier[entry]))
             if entry == "FactionDamage":
                 self.stats.Damage[entry] = round(baseStats.Damage[entry] + mods.Multiplier[entry], 1)
             else:
