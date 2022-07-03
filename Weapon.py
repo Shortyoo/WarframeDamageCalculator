@@ -18,7 +18,8 @@ class Weapon:
             self.BaseDamage = self.BaseDamage + self.stats.Damage[entry]
 
         for entry in DamageTypes().Additionals:
-            self.stats.Damage[entry] = round(baseStats.Damage[entry] * (1 + mods.Multiplier[entry]), 1)
+            print(entry + ": "+ str(mods.Multiplier[entry]))
+            self.stats.Damage[entry] = round(baseStats.Damage[entry] + (1 + mods.Multiplier[entry]), 1)
 
         # Add and sum toxin, slash and stuff
         for entry in DamageTypes().Damage:
@@ -41,6 +42,12 @@ class Weapon:
             if entry == "BaseDamage":
                 continue
             string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
+
+        string = string + "\t" + "Approximately " + str(self.stats.Damage["Multishot"] * (self.stats.Damage["StatusChance"] / 100)) + " Status Procs per shot with following probability: \r\n"
+        procs = self.CalculateProcs()
+        for entry in procs.keys():
+            string = string + "\t\t" + entry + ": " + str(procs[entry]) + " = " + str(procs[entry] * self.stats.Damage["Multishot"]) + "\r\n"
+
         return string
 
     def CalculateProcs(self):

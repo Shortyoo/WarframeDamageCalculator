@@ -84,3 +84,6 @@ else:
         print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(), ",f"))
         if entry.weapon.Name == "Sarpa":
             entry.CalculateSlashDamage()
+
+    for entry in damage:
+        print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats())
