@@ -19,7 +19,10 @@ class Weapon:
 
         for entry in DamageTypes().Additionals:
             print(entry + ": "+ str(mods.Multiplier[entry]))
-            self.stats.Damage[entry] = round(baseStats.Damage[entry] + (1 + mods.Multiplier[entry]), 1)
+            if entry == "FactionDamage":
+                self.stats.Damage[entry] = round(baseStats.Damage[entry] + mods.Multiplier[entry], 1)
+            else:
+                self.stats.Damage[entry] = round(baseStats.Damage[entry] * (1 + mods.Multiplier[entry]), 1)
 
         # Add and sum toxin, slash and stuff
         for entry in DamageTypes().Damage:
