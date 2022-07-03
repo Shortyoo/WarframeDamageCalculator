@@ -7,6 +7,13 @@ from Damage import Damage
 from Enemy import Enemy
 from DamageTypes import DamageTypes
 import configparser
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-hm", "--hunterMunition", help="Tries to proc HunterMunition on every weapon on every shot", action="store_true")
+parser.add_argument("-sS", "--showStats", help="Shows the stat of each weapon after calculation", action="store_true")
+parser.add_argument("-s", "--slash", help ="Calculates the damage of all slash procs", action="store_true")
+args = parser.parse_args()
 
 def loadWeapon(name: str):
     weaponParser = configparser.ConfigParser()
@@ -73,11 +80,11 @@ else:
     #sarpaDmg.CalculateSlashDamage()
 
     for entry in damage:
-        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateSingleshot(), ",f"))
-        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(), ",f"))
-        if entry.weapon.Name == "Sarpa":
+        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
+        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
+        if args.slash:
             entry.CalculateSlashDamage()
 
-    for entry in damage:
-        print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats())
-        pass
+    if args.showStats:
+        for entry in damage:
+            print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats())
