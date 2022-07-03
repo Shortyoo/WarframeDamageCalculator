@@ -43,5 +43,5 @@ class Damage:
 
     def CalculateSlashDamage(self):
         headshot = 1 # we aim for the head
-        baseSlash = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot)
+        baseSlash = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.enemy.armor.ArmorMultiplier["Slash"])
         print("baseSlash: " + str(baseSlash))
