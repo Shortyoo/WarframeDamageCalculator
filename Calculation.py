@@ -5,6 +5,7 @@ from Mods import Mods
 from Health import Health
 from Damage import Damage
 from Enemy import Enemy
+from Status import Status
 from DamageTypes import DamageTypes
 import configparser
 import argparse
@@ -67,7 +68,13 @@ else:
     gunnerHealth.HealthMultiplier["Slash"] = 0.25
     gunnerHealth.HealthMultiplier["Viral"] = 0.75
 
-    gunner = Enemy(gunnerArmor, gunnerHealth)
+    gunnerStatus = Status()
+    gunnerStatus.Status["Viral"] = 10
+    gunnerStatus.Status["Corrosive"] = 10
+    gunnerStatus.Status["Heat"] = 1
+    gunnerStatus.Status["CorrosiveProjection"] = 0
+
+    gunner = Enemy(gunnerHealth, gunnerArmor, gunnerStatus, 102058.45, 10410.23)
 
     damage = []
     for weapon in weapons:
@@ -84,7 +91,10 @@ else:
         print(entry.weapon.Name + "Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
         print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
         if args.slash:
-            entry.CalculateSlashDamage()
+            tickDamage = float(entry.CalculateSlashDamage())
+            print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
+            print("Damage after 6 Seconds with Slash: " + str(tickDamage * 6))
+            print("Total Damage: ")
 
     if args.showStats:
         for entry in damage:

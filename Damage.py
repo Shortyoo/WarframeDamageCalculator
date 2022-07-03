@@ -10,8 +10,8 @@ class Damage:
 
     def DamageModifier(self, str):
         # https://warframe.fandom.com/wiki/Damage/Corrosive_Damage
-        corrProcs = self.CalculateCorrosiveProcs()
-        armorValue = self.enemy.Armor * (1 - corrProcs)
+        armorReduction = self.CalculateArmorReduction()
+        armorValue = self.enemy.Armor * (armorReduction)
 
         headshot = 1 # we aim for the head
         # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
@@ -28,20 +28,36 @@ class Damage:
     def CalculateMultishot(self, procHunterMunition: bool):
         return self.CalculateSingleshot(procHunterMunition) * self.weapon.stats.Damage["Multishot"]
 
-    def CalculateCorrosiveProcs(self):
+    def CalculateArmorReduction(self):
         armorReduction = 0
-        procs = self.weapon.CalculateProcs()
 
-        if "Corrosive" in procs:
-            if procs["Corrosive"] > 1:
-                armorReduction = 0.26 + procs["Corrosive"] * 0.06
-                if armorReduction > 0.8:
-                    armorReduction = 0.8
+        reductionByHeatProcs = 1
+        if "Heat" in self.enemy.status.Status and self.enemy.status.Status["Heat"] >= 1:
+            reductionByHeatProcs = 0.5
 
+        reductionByCorrosiveProjection = 1 - (0.18 * int(self.enemy.status.Status["CorrosiveProjection"]))
+
+        reductionByCorrosiveProcs = 1
+
+        if "Corrosive" in self.enemy.status.Status and self.enemy.status.Status["Corrosive"] >= 1:
+            reductionByCorrosiveProcs = (1 - (0.2 + 0.06 * int(self.enemy.status.Status["Corrosive"])))
+
+        armorReduction = reductionByHeatProcs * reductionByCorrosiveProcs * reductionByCorrosiveProjection
+
+        armorReduction = round(armorReduction, 5)
         return armorReduction
-
 
     def CalculateSlashDamage(self):
         headshot = 1 # we aim for the head
-        baseSlash = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.enemy.armor.ArmorMultiplier["Slash"])
-        print("baseSlash: " + str(baseSlash))
+        slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.enemy.armor.ArmorMultiplier["Slash"])
+
+        slashDamagePerTickTimesSlashProcs = slashDamagePerTick
+        if "Slash" in self.enemy.status.Status and self.enemy.status.Status["Slash"] >= 1:
+            slashDamagePerTickTimesSlashProcs = slashDamagePerTick * int(self.enemy.status.Status["Slash"])
+
+        slashDamageWithViral = slashDamagePerTickTimesSlashProcs
+        # https://warframe.fandom.com/wiki/Damage/Viral_Damage
+        if "Viral" in self.enemy.status.Status and self.enemy.status.Status["Viral"] >= 1:
+            slashDamageWithViral = slashDamagePerTick * (2 + (0.25 * (self.enemy.status.Status["Viral"] - 1)))
+
+        return slashDamageWithViral
