@@ -4,6 +4,7 @@ from Stats import Stats
 from Mods import Mods
 from Health import Health
 from Damage import Damage
+from Shield import Shield
 from Enemy import Enemy
 from Status import Status
 from DamageTypes import DamageTypes
@@ -34,8 +35,58 @@ def loadMod(name: str):
         mods.Multiplier[entry] = float(modParser["Mods"][entry])
     return mods
 
+def loadEnemy(name: str):
+    enemyParser = configparser.ConfigParser()
+    enemyParser.read("Enemies/" + name + ".ini")
+
+    hp = int(enemyParser["Base"]["HP"])
+    armor = int(enemyParser["Base"]["Armor"])
+    shield = int(enemyParser["Base"]["Shield"])
+    baseLevel = int(enemyParser["Base"]["BaseLevel"])
+    level = int(enemyParser["Base"]["Level"])
+    name = str(enemyParser["Base"]["Name"])
+
+    if level - baseLevel < 70:
+        armor = round(armor * (1 + 0.0005 * (level - baseLevel)**1.75), 2)
+        hp = round(hp * (1 + 0.015 * (level - baseLevel)**2), 2)
+        shield = round(shield * (1 + 0.02*(level - baseLevel)**1.75), 2)
+    else:
+        armor = round(armor * (1 + 0.4 * (level - baseLevel)**0.75), 2)
+        hp = round(hp * (1 + (24*(5**0.5)/5) * (level - baseLevel) ** 0.5), 2)
+        shield = round(shield * (1 + 1.6*(level - baseLevel)**0.75), 2)
+
+    if int(enemyParser["Base"]["SteelPath"]) == 1:
+        # at first, add the armor value that it gains from + 100 levels
+        # https://warframe.fandom.com/wiki/The_Steel_Path
+
+        hp = hp * 2.5
+        armor = armor * 2.5
+        shield = shield * 2.5
+
+    gunnerArmor = Armor()
+    for entry in DamageTypes().Damage:
+        gunnerArmor.ArmorMultiplier[entry] = float(enemyParser["Armor"][entry])
+
+    gunnerHealth = Health()
+    for entry in DamageTypes().Damage:
+        gunnerHealth.HealthMultiplier[entry] = float(enemyParser["Health"][entry])
+
+    gunnerShield = Shield()
+    for entry in DamageTypes().Damage:
+        gunnerShield.ShieldMultiplier[entry] = float(enemyParser["Shield"][entry])
+
+    gunnerStatus = Status()
+    for entry in DamageTypes().Damage:
+        gunnerStatus.Status[entry] = float(enemyParser["ActiveProcs"][entry])
+
+    gunnerStatus.Status["CorrosiveProjection"] = enemyParser["ActiveProcs"]["CorrosiveProjection"]
+
+    return Enemy(gunnerHealth, gunnerArmor, gunnerShield, hp, armor, shield, gunnerStatus, name)
+
+
 weaponStatList = []
 modStatList = []
+enemyList = []
 
 calculationParser = configparser.ConfigParser()
 calculationParser.read("Calculation.ini")
@@ -45,39 +96,22 @@ for entry in calculationParser["Weapons"]:
 for entry in calculationParser["Mods"]:
     modStatList.append(loadMod(str(calculationParser["Mods"][entry])))
 
-weapons = []
+for entry in calculationParser["Enemy"]:
+    enemyList.append(loadEnemy(str(calculationParser["Enemy"][entry])))
 
-if len(weaponStatList) != len(modStatList):
-    print("Uneven length of weapons and mods!")
+if len(weaponStatList) != len(modStatList) or len(weaponStatList) != len(enemyList) or len(modStatList) != len(enemyList):
+    print("Unmatching list-lengths!!")
 
 else:
+    weapons = []
+
     for i in range(0, len(weaponStatList)):
         weapons.append(Weapon(weaponStatList[i], modStatList[i]))
 
-    gunnerArmor = Armor()
-    gunnerArmor.ArmorMultiplier["Corrosive"] = 0.75
-    gunnerArmor.ArmorMultiplier["Puncture"] = 0.5
-    gunnerArmor.ArmorMultiplier["Blast"] = -0.25
-    gunnerArmor.ArmorMultiplier["Slash"] = -0.25
-
-    gunnerHealth = Health()
-    gunnerHealth.HealthMultiplier["Gas"] = -0.5
-    gunnerHealth.HealthMultiplier["Impact"] = -0.25
-    gunnerHealth.HealthMultiplier["Heat"] = 0.25
-    gunnerHealth.HealthMultiplier["Slash"] = 0.25
-    gunnerHealth.HealthMultiplier["Viral"] = 0.75
-
-    gunnerStatus = Status()
-    gunnerStatus.Status["Viral"] = 0
-    gunnerStatus.Status["Corrosive"] = 0
-    gunnerStatus.Status["Heat"] = 0
-    gunnerStatus.Status["CorrosiveProjection"] = 0
-
-    gunner = Enemy(gunnerHealth, gunnerArmor, gunnerStatus, 88639.62, 8508.85)
-
     damage = []
-    for weapon in weapons:
-        damage.append(Damage(weapon, gunner))
+
+    for i in range(0, len(weapons)):
+        damage.append(Damage(weapons[i], enemyList[i]))
 
     #print("Hek Stats: \n" + HekWeap.ShowStats())
     #print("Strun Stats: \n" + StrunWeap.ShowStats())
@@ -87,8 +121,8 @@ else:
     #sarpaDmg.CalculateSlashDamage()
 
     for entry in damage:
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateSingleshot(), ",f"))
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateMultishot(), ",f"))
+        print(entry.BuildString() + " Projectile: " + format(entry.CalculateSingleshot(), ",f"))
+        print(entry.BuildString() + " Multishot: " + format(entry.CalculateMultishot(), ",f"))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
         DPS = magsize / firerate
@@ -97,7 +131,7 @@ else:
         if DPS > 1:
             DPS = entry.weapon.stats.Damage["FireRate"]
 
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot() * DPS, ",f"))
+        print(entry.BuildString() + " DPS: " + format(entry.CalculateMultishot() * DPS, ",f"))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))

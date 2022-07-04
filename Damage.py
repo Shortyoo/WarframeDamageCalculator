@@ -32,14 +32,14 @@ class Damage:
         armorReduction = 0
 
         reductionByHeatProcs = 1
-        if "Heat" in self.enemy.status.Status and self.enemy.status.Status["Heat"] >= 1:
+        if self.enemy.status.Status["Heat"] >= 1:
             reductionByHeatProcs = 0.5
 
         reductionByCorrosiveProjection = 1 - (0.18 * int(self.enemy.status.Status["CorrosiveProjection"]))
 
         reductionByCorrosiveProcs = 1
 
-        if "Corrosive" in self.enemy.status.Status and self.enemy.status.Status["Corrosive"] >= 1:
+        if self.enemy.status.Status["Corrosive"] >= 1:
             reductionByCorrosiveProcs = (1 - (0.2 + 0.06 * int(self.enemy.status.Status["Corrosive"])))
 
         armorReduction = reductionByHeatProcs * reductionByCorrosiveProcs * reductionByCorrosiveProjection
@@ -52,12 +52,15 @@ class Damage:
         slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.enemy.armor.ArmorMultiplier["Slash"])
 
         slashDamagePerTickTimesSlashProcs = slashDamagePerTick
-        if "Slash" in self.enemy.status.Status and self.enemy.status.Status["Slash"] >= 1:
+        if self.enemy.status.Status["Slash"] >= 1:
             slashDamagePerTickTimesSlashProcs = slashDamagePerTick * int(self.enemy.status.Status["Slash"])
 
         slashDamageWithViral = slashDamagePerTickTimesSlashProcs
         # https://warframe.fandom.com/wiki/Damage/Viral_Damage
-        if "Viral" in self.enemy.status.Status and self.enemy.status.Status["Viral"] >= 1:
+        if self.enemy.status.Status["Viral"] >= 1:
             slashDamageWithViral = slashDamagePerTick * (2 + (0.25 * (self.enemy.status.Status["Viral"] - 1)))
 
         return slashDamageWithViral
+
+    def BuildString(self):
+        return self.weapon.Name + " with Build: " + self.weapon.ModName + " against: " + self.enemy.Name
