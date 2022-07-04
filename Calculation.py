@@ -30,7 +30,7 @@ def loadWeapon(name: str):
 def loadMod(name: str):
     modParser = configparser.ConfigParser()
     modParser.read("Mods/" + name + ".ini")
-    mods = Mods()
+    mods = Mods(name)
     for entry in DamageTypes().Multiplier:
         mods.Multiplier[entry] = float(modParser["Mods"][entry])
     return mods
@@ -69,12 +69,12 @@ else:
     gunnerHealth.HealthMultiplier["Viral"] = 0.75
 
     gunnerStatus = Status()
-    gunnerStatus.Status["Viral"] = 10
-    gunnerStatus.Status["Corrosive"] = 10
-    gunnerStatus.Status["Heat"] = 1
+    gunnerStatus.Status["Viral"] = 0
+    gunnerStatus.Status["Corrosive"] = 0
+    gunnerStatus.Status["Heat"] = 0
     gunnerStatus.Status["CorrosiveProjection"] = 0
 
-    gunner = Enemy(gunnerHealth, gunnerArmor, gunnerStatus, 102058.45, 10410.23)
+    gunner = Enemy(gunnerHealth, gunnerArmor, gunnerStatus, 88639.62, 8508.85)
 
     damage = []
     for weapon in weapons:
@@ -88,8 +88,9 @@ else:
     #sarpaDmg.CalculateSlashDamage()
 
     for entry in damage:
-        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
-        print(entry.weapon.Name + "Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot(args.hunterMunition) * entry.weapon.stats.Damage["FireRate"], ",f"))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
