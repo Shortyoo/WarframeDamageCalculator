@@ -7,5 +7,5 @@ class Enemy:
         self.armor = armor
         self.health = health
         self.status = status
-        self.Armor = 10410.23
-        self.HP = 102058.45
+        self.Armor = Armor
+        self.HP = HP
