@@ -90,7 +90,15 @@ else:
     for entry in damage:
         print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
         print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot(args.hunterMunition) * entry.weapon.stats.Damage["FireRate"], ",f"))
+        firerate = entry.weapon.stats.Damage["FireRate"]
+        magsize = entry.weapon.stats.Damage["MagSize"]
+        DPS = magsize / firerate
+        # If DPS < 1, means that we cant even fire for 1 second.
+        # DPS > 1 means we could fire for more than 1 sec, but we want the exact value for 1 sec
+        if DPS > 1:
+            DPS = entry.weapon.stats.Damage["FireRate"]
+
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot(args.hunterMunition) * DPS, ",f"))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
