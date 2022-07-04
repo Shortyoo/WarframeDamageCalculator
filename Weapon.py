@@ -6,6 +6,7 @@ class Weapon:
     def __init__(self, baseStats: Stats, mods: Mods):
         self.stats = Stats("")
         self.Name = baseStats.Name
+        self.ModName = mods.Name
         self.BaseDamage = 0
         self.UnmoddedDamage = 0
 
@@ -45,7 +46,7 @@ class Weapon:
                 continue
             string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
 
-        string = string + "\t" + "Approximately " + str(self.stats.Damage["Multishot"] * (self.stats.Damage["StatusChance"] / 100)) + " Status Procs per shot with following probability: \r\n"
+        string = string + "\t" + "Approximately " + str(round(self.stats.Damage["Multishot"] * (self.stats.Damage["StatusChance"] / 100), 5)) + " Status Procs per shot with following probability: \r\n"
 
         if showProcs:
             procs = self.CalculateProcs()
