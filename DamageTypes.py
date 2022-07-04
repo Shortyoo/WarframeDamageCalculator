@@ -6,7 +6,7 @@ class DamageTypes:
         , "Viral"]
         self.Physical = ["Impact", "Puncture", "Slash"]
         self.Additionals = ["BaseDamage", "CritChance", "CritDamage"
-        , "StatusChance", "Multishot", "FactionDamage", "FireRate"]
+        , "StatusChance", "Multishot", "FactionDamage", "FireRate", "MagSize"]
 
         self.Elementals = [] # BaseElementals + FusedElementals
         self.Damage = [] # Physical + Elementals
