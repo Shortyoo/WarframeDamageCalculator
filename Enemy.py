@@ -7,7 +7,14 @@ class Enemy:
         self.armor = armor
         self.health = health
         self.status = status
-        self.Armor = Armor
-        self.HP = HP
-        self.Shield = Shield
+        self.shield = shield
+        self.Armor = float(Armor)
+        self.HP = float(HP)
+        self.Shield = float(Shield)
         self.Name = name
+        self.remainingHP = float(HP)
+        self.remainingShield = float(Shield)
+
+        #print("Remaining Shield: " + str(self.remainingShield))
+        #print("Armor: " + str(self.Armor))
+        #print("Remaining HP: " + str(self.remainingHP))

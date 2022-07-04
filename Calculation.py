@@ -121,8 +121,9 @@ else:
     #sarpaDmg.CalculateSlashDamage()
 
     for entry in damage:
-        print(entry.BuildString() + " Projectile: " + format(entry.CalculateSingleshot(), ",f"))
-        print(entry.BuildString() + " Multishot: " + format(entry.CalculateMultishot(), ",f"))
+        print("Quanta: " + str(entry.weapon.Quantum()))
+        #entry.ShootEnemy()
+        print(entry.BuildString() + " Projectile: " + format(entry.CalculateRawDamage(), ",f"))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
         DPS = magsize / firerate
@@ -131,7 +132,7 @@ else:
         if DPS > 1:
             DPS = entry.weapon.stats.Damage["FireRate"]
 
-        print(entry.BuildString() + " DPS: " + format(entry.CalculateMultishot() * DPS, ",f"))
+        print(entry.BuildString() + " DPS: " + format(entry.CalculateRawDamageMultiShot() * DPS, ",f"))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
