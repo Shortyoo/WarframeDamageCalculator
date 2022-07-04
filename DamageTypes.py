@@ -7,6 +7,7 @@ class DamageTypes:
         self.Physical = ["Impact", "Puncture", "Slash"]
         self.Additionals = ["BaseDamage", "CritChance", "CritDamage"
         , "StatusChance", "Multishot", "FactionDamage", "FireRate", "MagSize"]
+        self.SpecialMods = ["HunterMunition"]
 
         self.Elementals = [] # BaseElementals + FusedElementals
         self.Damage = [] # Physical + Elementals

@@ -11,7 +11,6 @@ import configparser
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-hm", "--hunterMunition", help="Tries to proc HunterMunition on every weapon on every shot", action="store_true")
 parser.add_argument("-sS", "--showStats", help="Shows the stat of each weapon after calculation", action="store_true")
 parser.add_argument("-s", "--slash", help ="Calculates the damage of all slash procs", action="store_true")
 parser.add_argument("-sP", "--showProcs", help ="Calculates the probability to apply a proc on the opponent", action="store_true")
@@ -88,8 +87,8 @@ else:
     #sarpaDmg.CalculateSlashDamage()
 
     for entry in damage:
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateSingleshot(args.hunterMunition), ",f"))
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateMultishot(args.hunterMunition), ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateSingleshot(), ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " Projectile: " + format(entry.CalculateMultishot(), ",f"))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
         DPS = magsize / firerate
@@ -98,7 +97,7 @@ else:
         if DPS > 1:
             DPS = entry.weapon.stats.Damage["FireRate"]
 
-        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot(args.hunterMunition) * DPS, ",f"))
+        print(entry.weapon.Name + " with Build: " + entry.weapon.ModName + " DPS: " + format(entry.CalculateMultishot() * DPS, ",f"))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
@@ -107,4 +106,4 @@ else:
 
     if args.showStats:
         for entry in damage:
-            print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats(args.showProcs, args.hunterMunition))
+            print(entry.weapon.Name + " Stats:\n" + entry.weapon.ShowStats(args.showProcs))

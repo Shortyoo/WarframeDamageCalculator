@@ -17,7 +17,7 @@ class Damage:
         # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
         return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[str]))) * (1 + self.enemy.armor.ArmorMultiplier[str]) * (1 + self.enemy.health.HealthMultiplier[str]) * (1 + ((self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"])) * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + headshot)
 
-    def CalculateSingleshot(self, procHunterMunition: bool):
+    def CalculateSingleshot(self):
         self.singleDamage = {}
         self.totalDamage = 0
         for entry in DamageTypes().Damage:
@@ -25,8 +25,8 @@ class Damage:
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
         return self.totalDamage
 
-    def CalculateMultishot(self, procHunterMunition: bool):
-        return self.CalculateSingleshot(procHunterMunition) * self.weapon.stats.Damage["Multishot"]
+    def CalculateMultishot(self):
+        return self.CalculateSingleshot() * self.weapon.stats.Damage["Multishot"]
 
     def CalculateArmorReduction(self):
         armorReduction = 0
