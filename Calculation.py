@@ -123,7 +123,9 @@ else:
     for entry in damage:
         print("Quanta: " + str(entry.weapon.Quantum()))
         #entry.ShootEnemy()
-        print(entry.BuildString() + " Projectile: " + format(entry.CalculateRawDamage(), ",f"))
+        damage = entry.CalculateRawDamage()
+        print(entry.BuildString() + " Damage against Shield: " + format(damage[0], ",f"))
+        print(entry.BuildString() + " Damage against Health: " + format(damage[1], ",f"))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
         DPS = magsize / firerate
