@@ -13,6 +13,7 @@ class Weapon:
         self.BaseDamageMultiplier = 1 + mods.Multiplier["BaseDamage"]
 
         for entry in DamageTypes().Damage:
+            #print(entry+" : "+str(baseStats.Damage[entry] * self.BaseDamageMultiplier))
             self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
 
         # Set the base damage
