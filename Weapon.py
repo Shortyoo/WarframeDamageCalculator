@@ -13,20 +13,16 @@ class Weapon:
         self.BaseDamageMultiplier = 1 + mods.Multiplier["BaseDamage"]
 
         for entry in DamageTypes().Damage:
-            #print(entry+" : "+str(baseStats.Damage[entry] * self.BaseDamageMultiplier))
             self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
 
         # Set the base damage
         for entry in DamageTypes().Damage:
             self.stats.Damage[entry] = round(baseStats.Damage[entry] * self.BaseDamageMultiplier, 1)
-            self.BaseDamage = self.BaseDamage + self.stats.Damage[entry]
+            self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
 
         # Add and sum toxin, slash and stuff
         for entry in DamageTypes().Damage:
-            #if self.stats.Damage[entry] > 0:
-            self.stats.Damage[entry] = self.stats.Damage[entry] + (self.UnmoddedDamage * mods.Multiplier[entry] * (1 + mods.Multiplier["BaseDamage"]))
-
-        self.stats = baseStats
+            self.stats.Damage[entry] = self.stats.Damage[entry] + (self.BaseDamage * mods.Multiplier[entry])
 
         for entry in DamageTypes().Additionals:
             if entry == "FactionDamage":
@@ -42,14 +38,17 @@ class Weapon:
         return self.UnmoddedDamage / 16
 
     def QuantizedDamageType(self, type: str):
-        return round((self.stats.Damage[type] / self.Quantum()) * (1 + self.mods.Multiplier[type]) * self.BaseDamageMultiplier, 0) * self.Quantum()
+        return round((self.stats.Damage[type] / self.Quantum()) * self.BaseDamageMultiplier, 0) * self.Quantum()
 
     def ShowStats(self, showProcs: bool):
         string = ""
         for entry in DamageTypes().Multiplier:
             if entry == "BaseDamage":
                 continue
-            string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
+            if entry in DamageTypes().Additionals:
+                string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
+            else:
+                string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry] * self.BaseDamageMultiplier, 1)) + "\r\n"
 
         if showProcs:
             string = string + "\t" + "Approximately " + str(round(self.stats.Damage["Multishot"] * (self.stats.Damage["StatusChance"] / 100), 5)) + " Status Procs per shot with following probability: \r\n"
