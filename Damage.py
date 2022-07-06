@@ -14,6 +14,7 @@ class Damage:
         armorValue = self.enemy.Armor * (armorReduction)
 
         # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
+        #print(type+"modifier: "+str((300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[type]))) * (1 + self.enemy.armor.ArmorMultiplier[type]) * (1 + self.enemy.health.HealthMultiplier[type])))
         return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[type]))) * (1 + self.enemy.armor.ArmorMultiplier[type]) * (1 + self.enemy.health.HealthMultiplier[type])
 
     def GeneralDamageAmplifier(self):
@@ -25,10 +26,9 @@ class Damage:
         return (1 + self.enemy.shield.ShieldMultiplier[entry])
 
     def SubtractDamage(self, damage, multishot, attribute):
-        while multishot > 0 or attribute > 0:
+        while multishot > 0 and attribute > 0:
             attribute = attribute - damage
             multishot = multishot - 1
-
         # Maybe we have Multishot 12.2, we calculated 12 rounds but I want to consider that leftover 0.2 as well
         if multishot < 1 and attribute > 0:
             attribute = attribute - (damage * multishot)
@@ -38,7 +38,7 @@ class Damage:
     def ShootEnemy(self):
         shots = 0
         while self.enemy.remainingHP > 0:
-            shot = shots + 1
+            shots = shots + 1
             # Destroy shield before attacking HP
             multishot = self.weapon.stats.Damage["Multishot"]
             if self.enemy.remainingShield > 0:
@@ -50,7 +50,10 @@ class Damage:
                     (multishot, self.enemy.remainingHP) = self.SubtractDamage(damage, multishot, self.enemy.remainingHP)
             else:
                 damage = self.CalculateSingleshot(self.DamageModifierArmor)
+                #print("Damage: "+str(damage) + " HP: " + str(self.enemy.remainingHP))
+                #print("Multishot: "+str(multishot))
                 (multishot, self.enemy.remainingHP) = self.SubtractDamage(damage, multishot, self.enemy.remainingHP)
+                #print("Remaining hP: "+ str(self.enemy.remainingHP))
 
         self.enemy.remainingHP = self.enemy.HP
         self.enemy.remainingShield = self.enemy.remainingShield
@@ -61,14 +64,18 @@ class Damage:
         self.singleDamage = {}
         self.totalDamage = 0
         for entry in DamageTypes().Damage:
+            # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
+            # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
             self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry) * function(entry)
             #print(entry + "-Damage: " + str(self.singleDamage[entry]))
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
+
+        self.totalDamage = self.totalDamage * self.GeneralDamageAmplifier()
         print("Total: "+ str(self.totalDamage))
-        return self.totalDamage * self.GeneralDamageAmplifier()
+        return round(self.totalDamage, 0)
 
     def CalculateRawDamage(self):
-        return self.CalculateSingleshot(self.DamageModifierArmor)
+        return (self.CalculateSingleshot(self.DamageModifierShield), self.CalculateSingleshot(self.DamageModifierArmor))
 
     def CalculateRawDamageMultiShot(self):
         return self.CalculateSingleshot(self.DamageModifierArmor) * self.weapon.stats.Damage["Multishot"]
