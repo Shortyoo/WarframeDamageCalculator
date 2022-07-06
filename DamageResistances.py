@@ -102,8 +102,8 @@ class DamageResistances:
         self.Resistance["Toxin"]["Machinery"]=-0.25
         self.Resistance["Toxin"]["Robotic"]=-0.25
         self.Resistance["Toxin"]["Object"]=0.00
-        self.Resistance["Toxin"]["Shield"]=0.00 #BYPASS
-        self.Resistance["Toxin"]["Proto Shield"]=0.00 #BYPASS
+        self.Resistance["Toxin"]["Shield"]=-1.00 #BYPASS
+        self.Resistance["Toxin"]["Proto Shield"]=-1.00 #BYPASS
         self.Resistance["Toxin"]["Ferrite Armor"]=0.00
         self.Resistance["Toxin"]["Alloy Armor"]=0.00
 
@@ -196,3 +196,9 @@ class DamageResistances:
         self.Resistance["Viral"]["Proto Shield"]=0.00
         self.Resistance["Viral"]["Ferrite Armor"]=0.00
         self.Resistance["Viral"]["Alloy Armor"]=0.00
+
+
+    def GetMultiplier(self, damageType: str, defenseType: str):
+        if defenseType == "None":
+            return 0
+        return self.Resistance[damageType][defenseType]
