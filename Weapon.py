@@ -11,16 +11,19 @@ class Weapon:
         self.BaseDamage = 0
         self.UnmoddedDamage = 0
         self.BaseDamageMultiplier = 1 + mods.Multiplier["BaseDamage"]
+        self.Quantum = 0
 
+        # https://warframe.fandom.com/wiki/Damage#Quantization
+        # We need the UnmoddedDamage-Variable for calculating our Quantum
         for entry in DamageTypes().Damage:
             self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
 
-        # Set the base damage
+        # Set the base damage. The base-damage is needed to calculate additional damage, like "Toxin" on "Braton Prime" when using "Infected Clip"
         for entry in DamageTypes().Damage:
             self.stats.Damage[entry] = round(baseStats.Damage[entry] * self.BaseDamageMultiplier, 1)
             self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
 
-        # Add and sum toxin, slash and stuff
+        # Add and sum toxin, slash and stuff (e.g. Calculating Toxin Damage for a weapon that got Toxin Damage through a mod, like "Infected Clip" on "Braton Prime")
         for entry in DamageTypes().Damage:
             self.stats.Damage[entry] = self.stats.Damage[entry] + (self.BaseDamage * mods.Multiplier[entry])
 
@@ -33,17 +36,16 @@ class Weapon:
         for entry in DamageTypes().SpecialMods:
             self.stats.Damage[entry] = mods.Multiplier[entry]
 
+        self.Quantum = float(self.UnmoddedDamage / 16)
 
-    def Quantum(self):
-        return self.UnmoddedDamage / 16
-
+    # see https://warframe.fandom.com/wiki/Damage#Damage_Calculation
     def QuantizedDamageType(self, type: str):
-        return round((self.stats.Damage[type] / self.Quantum()) * self.BaseDamageMultiplier, 0) * self.Quantum()
+        return round((self.stats.Damage[type] / self.Quantum) * self.BaseDamageMultiplier, 0) * self.Quantum
 
     def ShowStats(self, showProcs: bool):
         string = ""
         for entry in DamageTypes().Multiplier:
-            if entry == "BaseDamage":
+            if entry == "BaseDamage": # We just want to ignore that value. It doesn't show up in warframe either
                 continue
             if entry in DamageTypes().Additionals:
                 string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"

@@ -10,16 +10,16 @@ class Damage:
         self.DamageResistanceInstance = DamageResistances()
 
     def DamageModifierArmor(self, type):
-        # https://warframe.fandom.com/wiki/Damage/Corrosive_Damage
+        # see https://warframe.fandom.com/wiki/Damage/Corrosive_Damage
         armorReduction = self.CalculateArmorReduction()
         armorValue = self.enemy.armor * (armorReduction)
-        # https://warframe.fandom.com/wiki/Damage#Damage_Calculation
-        #print(type+"modifier: "+str((300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[type]))) * (1 + self.enemy.armor.ArmorMultiplier[type]) * (1 + self.enemy.health.HealthMultiplier[type])))
-        #print(type + " Modifier armor: "+ str((300 / (300 + armorValue * (1 - self.DamageResistanceInstance.GetMultiplier(type, self.enemy.armorType)))) * (1 + self.DamageResistanceInstance.GetMultiplier(type,self.enemy.armorType))))
-        #print(type + " Modifier health: "+str( (1 + self.DamageResistanceInstance.GetMultiplier(type,self.enemy.healthType))))
+        # see https://warframe.fandom.com/wiki/Damage#Armored_Enemies
+        # Variable names are shitty, but they're equal to above's link formula
+        AR = armorValue
+        AM = self.DamageResistanceInstance.GetMultiplier(type, self.enemy.armorType)
+        HM = self.DamageResistanceInstance.GetMultiplier(type,self.enemy.healthType)
 
-        #return (300 / (300 + armorValue * (1 - self.enemy.armor.ArmorMultiplier[type]))) * (1 + self.enemy.armor.ArmorMultiplier[type]) * (1 + self.enemy.health.HealthMultiplier[type])
-        return (300 / (300 + armorValue * (1 - self.DamageResistanceInstance.GetMultiplier(type, self.enemy.armorType)))) * (1 + self.DamageResistanceInstance.GetMultiplier(type,self.enemy.armorType)) * (1 + self.DamageResistanceInstance.GetMultiplier(type,self.enemy.healthType))
+        return (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)
 
     def GeneralDamageAmplifier(self):
         headshot = 0 # we aim for the head
@@ -27,14 +27,13 @@ class Damage:
         return critDmg * (1 + headshot) * (1 + self.weapon.stats.Damage["FactionDamage"])
 
     def DamageModifierShield(self, entry):
-        #return (1 + self.enemy.shield.ShieldMultiplier[entry])
         return (1 + self.DamageResistanceInstance.GetMultiplier(entry, self.enemy.shieldType))
 
     def SubtractDamage(self, damage, multishot, attribute):
         while multishot > 0 and attribute > 0:
             attribute = attribute - damage
             multishot = multishot - 1
-        # Maybe we have Multishot 12.2, we calculated 12 rounds but I want to consider that leftover 0.2 as well
+        # Maybe we have Multishot 12.2, we calculated 12 rounds but I want to consider that leftover 0.2 as well with that exact weight of 0.2
         if multishot < 1 and attribute > 0:
             attribute = attribute - (damage * multishot)
 
@@ -44,50 +43,53 @@ class Damage:
         shots = 0
         while self.enemy.remainingHealth > 0:
             shots = shots + 1
-            # Destroy shield before attacking HP
             multishot = self.weapon.stats.Damage["Multishot"]
+            # Destroy shield before attacking Health
             if self.enemy.remainingShield > 0:
                 damage = self.CalculateSingleshot(self.DamageModifierShield)
-                if self.enemy.shieldType == "Proto Shield" or self.enemy.shieldType == "Shield": #This bypasses Shields, so direct damage to health:
+                # Toxin Damage bypasses "Shield" and "Proto Shield". So we want to deal diect damage to health with it:
+                # see https://warframe.fandom.com/wiki/Damage/Overview_Table#All_
+                if self.enemy.shieldType == "Proto Shield" or self.enemy.shieldType == "Shield":
                     damageToHealth = round(self.weapon.QuantizedDamageType("Toxin") * self.DamageModifierArmor("Toxin"), 0)
                     self.enemy.remainingHealth = self.enemy.remainingHealth - damageToHealth
-                #print("In ShootEnemy: "+str(damage))
                 (multishot, self.enemy.remainingShield) = self.SubtractDamage(damage, multishot, self.enemy.remainingShield)
                 if self.enemy.remainingShield < 0:
                     damage = self.CalculateSingleshot(self.DamageModifierArmor)
                     (multishot, self.enemy.remainingHealth) = self.SubtractDamage(damage, multishot, self.enemy.remainingHealth)
+            # Damage to Health
             else:
                 damage = self.CalculateSingleshot(self.DamageModifierArmor)
-                #print("Damage: "+str(damage) + " HP: " + str(self.enemy.remainingHealth))
-                #print("Multishot: "+str(multishot))
                 (multishot, self.enemy.remainingHealth) = self.SubtractDamage(damage, multishot, self.enemy.remainingHealth)
-                #print("Remaining hP: "+ str(self.enemy.remainingHealth))
 
         self.enemy.remainingHealth = self.enemy.health
         self.enemy.remainingShield = self.enemy.remainingShield
 
         print("It took: " + str(shots) + " shots to kill " + self.enemy.Name)
 
+    # Calculates the damage of a single bullet
+    # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor
     def CalculateSingleshot(self, function):
         self.singleDamage = {}
         self.totalDamage = 0
         for entry in DamageTypes().Damage:
-            # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
+
             # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
             self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry) * function(entry)
-            #print(entry + "-Damage: " + str(self.singleDamage[entry]) + " QuantizedDamage: " + str(self.weapon.QuantizedDamageType(entry)))
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
 
+        # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
         self.totalDamage = self.totalDamage * self.GeneralDamageAmplifier()
-        #print("Total: "+ str(self.totalDamage))
         return round(self.totalDamage, 0)
 
+    # Calculates the raw damage for Shield and Health (through armor)
     def CalculateRawDamage(self):
         return (self.CalculateSingleshot(self.DamageModifierShield), self.CalculateSingleshot(self.DamageModifierArmor))
 
+    # Just mulitplies the RawDamage with the Multishot-Value
     def CalculateRawDamageMultiShot(self):
         return self.CalculateSingleshot(self.DamageModifierArmor) * self.weapon.stats.Damage["Multishot"]
 
+    # Not a real link, but rather collected information on what strips armor
     def CalculateArmorReduction(self):
         armorReduction = 0
 
@@ -109,7 +111,7 @@ class Damage:
 
     def CalculateSlashDamage(self):
         headshot = 1 # we aim for the head
-        slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.enemy.armor.ArmorMultiplier["Slash"])
+        slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.DamageResistances.GetMutliplier("Slash", self.enemy.armorType))
 
         slashDamagePerTickTimesSlashProcs = slashDamagePerTick
         if self.enemy.status.Status["Slash"] >= 1:

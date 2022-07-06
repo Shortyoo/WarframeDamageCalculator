@@ -44,15 +44,8 @@ else:
     for i in range(0, len(weapons)):
         damage.append(Damage(weapons[i], enemyList[i]))
 
-    #print("Hek Stats: \n" + HekWeap.ShowStats())
-    #print("Strun Stats: \n" + StrunWeap.ShowStats())
-    #print("Sarpa Stats: \n" + SarpaWeap.ShowStats())
-
-    #procs = SarpaWeap.CalculateProcs()
-    #sarpaDmg.CalculateSlashDamage()
-
     for entry in damage:
-        print("Quanta: " + str(entry.weapon.Quantum()))
+        print("Quantum: " + str(entry.weapon.Quantum))
         entry.ShootEnemy()
         dmg = entry.CalculateRawDamage()
         print(entry.BuildString() + " Damage against Shield: " + format(dmg[0], ",f"))
