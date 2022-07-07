@@ -13,20 +13,19 @@ class Weapon:
         self.BaseDamageMultiplier = 1 + mods.Multiplier["BaseDamage"]
         self.Quantum = 0
 
+        # Set the base damage. The base-damage is needed to calculate additional damage, like "Toxin" on "Braton Prime" when using "Infected Clip"
         # https://warframe.fandom.com/wiki/Damage#Quantization
         # We need the UnmoddedDamage-Variable for calculating our Quantum
         for entry in DamageTypes().Damage:
-            self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
-
-        # Set the base damage. The base-damage is needed to calculate additional damage, like "Toxin" on "Braton Prime" when using "Infected Clip"
-        for entry in DamageTypes().Damage:
-            self.stats.Damage[entry] = round(baseStats.Damage[entry] * self.BaseDamageMultiplier, 1)
+            self.stats.Damage[entry] = baseStats.Damage[entry]
             self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
+            self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
 
         # Add and sum toxin, slash and stuff (e.g. Calculating Toxin Damage for a weapon that got Toxin Damage through a mod, like "Infected Clip" on "Braton Prime")
         for entry in DamageTypes().Damage:
             self.stats.Damage[entry] = self.stats.Damage[entry] + (self.BaseDamage * mods.Multiplier[entry])
 
+        # Take CC, CD and multiply with mods
         for entry in DamageTypes().Additionals:
             if entry == "FactionDamage":
                 self.stats.Damage[entry] = round(baseStats.Damage[entry] + mods.Multiplier[entry], 1)
