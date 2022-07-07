@@ -27,8 +27,12 @@ for entry in calculationParser["Weapons"]:
 for entry in calculationParser["Mods"]:
     modStatList.append(Mods.loadMod(str(calculationParser["Mods"][entry])))
 
-for entry in calculationParser["Enemy"]:
-    enemyList.append(Enemy.loadEnemy(str(calculationParser["Enemy"][entry])))
+if len(calculationParser["Enemy"]) != len(calculationParser["EnemyLevel"]):
+    print("Unequal lengths of list \"Enemy\" and \"EnemyLevel\"")
+    exit(-1)
+
+for i in range(len(calculationParser.items("Enemy"))):
+    enemyList.append(Enemy.loadEnemy(str(calculationParser.items("Enemy")[i][1]), int(calculationParser.items("EnemyLevel")[i][1])))
 
 if len(weaponStatList) != len(modStatList) or len(weaponStatList) != len(enemyList) or len(modStatList) != len(enemyList):
     print("Unmatching list-lengths!!")

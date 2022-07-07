@@ -19,7 +19,7 @@ class Enemy:
         #print("Armor: " + str(self.Armor))
         #print("Remaining health: " + str(self.remainingHealth))
 
-    def loadEnemy(name: str):
+    def loadEnemy(name: str, level: int):
         enemyParser = configparser.ConfigParser()
         enemyParser.read("Enemies/" + name + ".ini")
 
@@ -27,7 +27,6 @@ class Enemy:
         armor = int(enemyParser["Base"]["Armor"])
         shield = int(enemyParser["Base"]["Shield"])
         baseLevel = int(enemyParser["Base"]["BaseLevel"])
-        level = int(enemyParser["Base"]["Level"])
         name = str(enemyParser["Base"]["Name"])
         healthType = str(enemyParser["Base"]["HealthType"])
         shieldType = str(enemyParser["Base"]["ShieldType"])
@@ -49,4 +48,4 @@ class Enemy:
             shield = shield * 2.5
             armor = armor * 2.5
 
-        return Enemy(health, shield, armor, name, healthType, shieldType, armorType)
+        return Enemy(health, shield, armor, name+ " : Level "+str(level), healthType, shieldType, armorType)
