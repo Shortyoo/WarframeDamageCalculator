@@ -18,12 +18,18 @@ class Damage:
         AR = armorValue
         AM = self.DamageResistanceInstance.GetMultiplier(type, self.enemy.armorType)
         HM = self.DamageResistanceInstance.GetMultiplier(type,self.enemy.healthType)
+        #print("AR: "+str(AR))
+        #print("AM: "+str(AM))
+        #print("HM: "+str(HM))
+        #print("Return: "+str( (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)))
 
         return (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)
 
     def GeneralDamageAmplifier(self):
         headshot = 0 # we aim for the head
-        critDmg = 1#self.weapon.stats.Damage["CritDamage"]#(1 + ((self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]))
+        critDmg = 1
+        #critDmg = self.weapon.stats.Damage["CritDamage"]
+        #critDmg = (1 + ((self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]))
         return critDmg * (1 + headshot) * (1 + self.weapon.stats.Damage["FactionDamage"])
 
     def DamageModifierShield(self, entry):
@@ -83,7 +89,9 @@ class Damage:
 
     # Calculates the raw damage for Shield and Health (through armor)
     def CalculateRawDamage(self):
-        return (self.CalculateSingleshot(self.DamageModifierShield), self.CalculateSingleshot(self.DamageModifierArmor))
+        if self.enemy.shieldType != "None":
+            return (self.CalculateSingleshot(self.DamageModifierShield), self.CalculateSingleshot(self.DamageModifierArmor))
+        return (0, self.CalculateSingleshot(self.DamageModifierArmor))
 
     # Just mulitplies the RawDamage with the Multishot-Value
     def CalculateRawDamageMultiShot(self):
@@ -111,7 +119,7 @@ class Damage:
 
     def CalculateSlashDamage(self):
         headshot = 1 # we aim for the head
-        slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * (1 + self.weapon.stats.Damage["FactionDamage"]) * (1 + (self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]) * (1 + headshot) * (1 + self.DamageResistances.GetMutliplier("Slash", self.enemy.armorType))
+        slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * self.GeneralDamageAmplifier() * (1 + self.DamageResistances.GetMutliplier("Slash", self.enemy.armorType))
 
         slashDamagePerTickTimesSlashProcs = slashDamagePerTick
         if self.enemy.status.Status["Slash"] >= 1:
