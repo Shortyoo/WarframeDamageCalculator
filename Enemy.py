@@ -3,7 +3,7 @@ import configparser
 from DamageTypes import DamageTypes
 
 class Enemy:
-    def __init__(self, health: float, shield: float, armor: float, name: str, healthType: str, shieldType: str, armorType: str):
+    def __init__(self, health: float, shield: float, armor: float, name: str, healthType: str, shieldType: str, armorType: str, status: Status):
         self.health = float(health)
         self.shield = float(shield)
         self.armor = float(armor)
@@ -13,13 +13,13 @@ class Enemy:
         self.armorType = str(armorType)
         self.remainingHealth = float(health)
         self.remainingShield = float(shield)
-        self.status = Status()
+        self.status = status
 
         #print("Remaining Shield: " + str(self.remainingShield))
         #print("Armor: " + str(self.Armor))
         #print("Remaining health: " + str(self.remainingHealth))
 
-    def loadEnemy(name: str, level: int):
+    def loadEnemy(name: str, level: int, status: Status):
         enemyParser = configparser.ConfigParser()
         enemyParser.read("Enemies/" + name + ".ini")
 
@@ -48,4 +48,4 @@ class Enemy:
             shield = shield * 2.5
             armor = armor * 2.5
 
-        return Enemy(health, shield, armor, name+ " : Level "+str(level), healthType, shieldType, armorType)
+        return Enemy(health, shield, armor, name+ " : Level "+str(level), healthType, shieldType, armorType, status)

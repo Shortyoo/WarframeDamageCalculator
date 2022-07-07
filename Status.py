@@ -1,10 +1,22 @@
 from DamageTypes import DamageTypes
+import configparser
+
+
 
 class Status:
-    def __init__(self):
-        self.Status = {}
+    def __init__(self, status):
+        self.Status = status
+
+    def loadStatus(name: str):
+
+        status = {}
+
+        statusParser = configparser.ConfigParser()
+        statusParser.read("ActiveProcs/"+name+".ini")
 
         for entry in DamageTypes().Damage:
-            self.Status[entry] = 0
+            status[entry] = int(statusParser["StatusProcs"][entry])
 
-        self.Status["CorrosiveProjection"] = 0
+        status["CorrosiveProjection"] = int(statusParser["StatusProcs"]["CorrosiveProjection"])
+
+        return Status(status)
