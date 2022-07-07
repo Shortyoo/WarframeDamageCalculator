@@ -54,8 +54,8 @@ else:
         #print("Quantum: " + str(entry.weapon.Quantum))
         #entry.ShootEnemy()
         dmg = entry.CalculateRawDamage()
-        print(entry.BuildString() + " Damage against Shield: " + format(dmg[0], ",f"))
-        print(entry.BuildString() + " Damage against Health: " + format(dmg[1], ",f"))
+        print(entry.BuildString() + " Damage against Shield: {:,.2f}".format(dmg[0]))
+        print(entry.BuildString() + " Damage against Health: {:,.2f}".format(dmg[1]))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
         DPS = magsize / firerate
@@ -64,7 +64,7 @@ else:
         if DPS > 1:
             DPS = entry.weapon.stats.Damage["FireRate"]
 
-        print(entry.BuildString() + " DPS: " + format(entry.CalculateRawDamageMultiShot() * DPS, ",f"))
+        print(entry.BuildString() + " DPS: {:,.2f}".format(entry.CalculateRawDamageMultiShot() * DPS))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
