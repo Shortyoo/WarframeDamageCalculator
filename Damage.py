@@ -25,11 +25,24 @@ class Damage:
 
         return (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)
 
-    def GeneralDamageAmplifier(self):
-        headshot = 0 # we aim for the head
+    # see https://warframe.fandom.com/wiki/Critical_Hit#Crit_Tiers
+    def CalculateCritMultiplier(self):
         critDmg = 1
+        critChance = self.weapon.stats.Damage["CritChance"]
+        critDamage = self.weapon.stats.Damage["CritDamage"]
+        # Example:
+        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
+        CritTier = 2 ** round(int(critChance / 100), 1)
+
+        CritTierMulti = 1 + CritTier * (critDamage - 1)
+
         #critDmg = self.weapon.stats.Damage["CritDamage"]
         #critDmg = (1 + ((self.weapon.stats.Damage["CritChance"] / 100) * self.weapon.stats.Damage["CritDamage"]))
+        return CritTierMulti
+
+    def GeneralDamageAmplifier(self):
+        headshot = 0 # we aim for the head
+        critDmg = self.CalculateCritMultiplier()
         return critDmg * (1 + headshot) * (1 + self.weapon.stats.Damage["FactionDamage"])
 
     def DamageModifierShield(self, entry):
