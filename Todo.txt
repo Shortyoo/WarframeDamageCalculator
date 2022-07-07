@@ -1,4 +1,3 @@
 - Apply Status Procs and Calcualte with them (i.e. Shotgun: First projectile applies Corrosive Proc -> all other projetiles shall make more damage then)
-- Curse an enemy with status procs initially (i.e. you're using a primer. The main weapon shall deal more damage now, though it doesnt apply any proc itself)
 - Maybe extract a list of weapons by Warframe.fandom? 
 - Take orange- and red crits in account
