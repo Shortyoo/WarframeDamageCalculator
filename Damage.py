@@ -33,7 +33,12 @@ class Damage:
         return critDmg * (1 + headshot) * (1 + self.weapon.stats.Damage["FactionDamage"])
 
     def DamageModifierShield(self, entry):
-        return (1 + self.DamageResistanceInstance.GetMultiplier(entry, self.enemy.shieldType))
+        damageTypeModifier = self.DamageResistanceInstance.GetMultiplier(entry, self.enemy.shieldType)
+        statusModifier = 0
+        if self.enemy.status.Status["Magnetic"] > 0:
+            statusModifier = (1 + (0.25 * (self.enemy.status.Status["Magnetic"] - 1)))
+
+        return (1 + damageTypeModifier + statusModifier)
 
     def SubtractDamage(self, damage, multishot, attribute):
         while multishot > 0 and attribute > 0:
