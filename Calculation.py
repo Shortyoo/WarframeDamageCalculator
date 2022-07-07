@@ -45,8 +45,8 @@ else:
         damage.append(Damage(weapons[i], enemyList[i]))
 
     for entry in damage:
-        print("Quantum: " + str(entry.weapon.Quantum))
-        entry.ShootEnemy()
+        #print("Quantum: " + str(entry.weapon.Quantum))
+        #entry.ShootEnemy()
         dmg = entry.CalculateRawDamage()
         print(entry.BuildString() + " Damage against Shield: " + format(dmg[0], ",f"))
         print(entry.BuildString() + " Damage against Health: " + format(dmg[1], ",f"))
