@@ -73,7 +73,7 @@ class Weapon:
 
     def CalculateProcs(self):
         probability = {}
-        for entry in DamageTypesInstance.Damage:
+        for entry in self.DamageTypesInstance.Damage:
             if self.stats.Damage[entry] > 0:
                 probability[entry] = 0
 
