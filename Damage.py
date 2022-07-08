@@ -91,10 +91,10 @@ class Damage:
         additionalMultiplier = 0
         galvanizedStacks = 0 # from 0-3 or 0-2, depending on the mod/weapon
         galvanizedDamagePerStack = 0 #ranging from 0.03 - 0.4
+        statusCount = self.enemy.GetStatusCount()
         for galvanizedDmgPerStatus in DamageTypesInstance.GalvanizedDmgPerStatus:
             if galvanizedDmgPerStatus in self.weapon.mods.Multiplier:
                 galvanizedStacks = self.weapon.mods.Multiplier[galvanizedDmgPerStatus]
-                statusCount = self.enemy.GetStatusCount()
                 galvanizedDamagePerStack = self.weapon.mods.Multiplier[DamageTypesInstance.DamagePerStack]
                 additionalMultiplier = additionalMultiplier + (statusCount * galvanizedDamagePerStack * galvanizedStacks)
         return additionalMultiplier
