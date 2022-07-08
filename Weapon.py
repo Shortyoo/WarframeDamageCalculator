@@ -45,10 +45,10 @@ class Weapon:
 
     def ShowStats(self, showProcs: bool):
         string = ""
-        for entry in DamageTypesInstance.Multiplier:
+        for entry in self.DamageTypesInstance.Multiplier:
             if entry == "BaseDamage": # We just want to ignore that value. It doesn't show up in warframe either
                 continue
-            if entry in DamageTypesInstance.Additionals:
+            if entry in self.DamageTypesInstance.Additionals:
                 string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
             else:
                 string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry] * self.BaseDamageMultiplier, 1)) + "\r\n"
