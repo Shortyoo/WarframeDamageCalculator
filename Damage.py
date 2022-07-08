@@ -106,9 +106,15 @@ class Damage:
                 break # There can be just one galvanized mod. No need to look for other ones
         return additionalMultiplier
 
-    def ApplyStatusProcs(self):
+    # Calculatates whether we're lucky to get an additional status/crit/multishot etc
+    def ProbabilityCheck(self, valueToCompareWith: int):
         rand = random.Random()
+        randValue = rand.randint(1,1000)
+        if randValue <= valueToCompareWith:
+            return 1
+        return 0
 
+    def ApplyStatusProcs(self):
         statusChance = self.weapon.stats.Damage["StatusChance"]
         guaranteedProcs = int(statusChance / 100) # i.e. Status Chance is 120%, we will have 1 guaranteed proc
         probabilityForAdditionalProc = statusChance - (guaranteedProcs*100) # subtract the guaranteedProcs
@@ -122,14 +128,11 @@ class Damage:
             damageTypes.append(entry)
             damageWeights.append(procProbability[entry])
 
-        # Calculate wheher we're lucky to get an additional status-proc
-        randValue = rand.randint(0,1000)
-        procCount = guaranteedProcs
-        if randValue <= probabilityToCompareWith:
-            procCount += 1
+        procCount = guaranteedProcs + self.ProbabilityCheck(probabilityToCompareWith)
 
         # choose a weighted but randomly chosen damageType thats available and
         # apply it to the enemy
+        rand = random.Random()
         for i in range(0, procCount):
             damageType = rand.choices(damageTypes, weights = damageWeights, k=1)[0]
             self.enemy.status.Status[damageType] += 1
