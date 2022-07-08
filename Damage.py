@@ -2,6 +2,7 @@ from Weapon import Weapon
 from DamageTypes import DamageTypes
 from Enemy import Enemy
 from DamageResistances import DamageResistances
+import random
 
 class Damage:
     def __init__(self, weapon: Weapon, enemy: Enemy):
@@ -50,10 +51,13 @@ class Damage:
 
         return (1 + damageTypeModifier + statusModifier)
 
+    # This method simulates the impact of the bullet to the enemy.
+    # So that's where our StatusProcs will be applied as well
     def SubtractDamage(self, damage, multishot, attribute):
         while multishot > 0 and attribute > 0:
             attribute = attribute - damage
             multishot = multishot - 1
+            self.ApplyStatusProcs()
         # Maybe we have Multishot 12.2, we calculated 12 rounds but I want to consider that leftover 0.2 as well with that exact weight of 0.2
         if multishot < 1 and attribute > 0:
             attribute = attribute - (damage * multishot)
@@ -92,12 +96,46 @@ class Damage:
         galvanizedStacks = 0 # from 0-3 or 0-2, depending on the mod/weapon
         galvanizedDamagePerStack = 0 #ranging from 0.03 - 0.4
         statusCount = self.enemy.GetStatusCount()
-        for galvanizedDmgPerStatus in self.DamageTypesInstance.GalvanizedDmgPerStatus:
-            if galvanizedDmgPerStatus in self.weapon.mods.Multiplier:
-                galvanizedStacks = self.weapon.mods.Multiplier[galvanizedDmgPerStatus]
+        
+        for galvanizedMod in self.DamageTypesInstance.GalvanizedMods:
+            if self.weapon.mods.Multiplier[galvanizedMod] > 0:
                 galvanizedDamagePerStack = self.weapon.mods.Multiplier[self.DamageTypesInstance.DamagePerStack]
+                galvanizedStacks = self.weapon.mods.Multiplier[galvanizedMod]
+
                 additionalMultiplier = additionalMultiplier + (statusCount * galvanizedDamagePerStack * galvanizedStacks)
+                break # There can be just one galvanized mod. No need to look for other ones
         return additionalMultiplier
+
+    def ApplyStatusProcs(self):
+        rand = random.Random()
+
+        statusChance = self.weapon.stats.Damage["StatusChance"]
+        guaranteedProcs = int(statusChance / 100) # i.e. Status Chance is 120%, we will have 1 guaranteed proc
+        probabilityForAdditionalProc = statusChance - (guaranteedProcs*100) # subtract the guaranteedProcs
+        probabilityToCompareWith = probabilityForAdditionalProc*10 # i.e. Status chance is 20.2%. We dont wanna miss those 0.2% when asking for a rand INT!
+        # Calculate which procs can occur which their %-chance
+        procProbability = self.weapon.CalculateProcs()
+        damageTypes = []
+        damageWeights = []
+        # prepare variabled
+        for entry in procProbability.keys():
+            damageTypes.append(entry)
+            damageWeights.append(procProbability[entry])
+
+        # Calculate wheher we're lucky to get an additional status-proc
+        randValue = rand.randint(0,1000)
+        procCount = guaranteedProcs
+        if randValue <= probabilityToCompareWith:
+            procCount += 1
+
+        # choose a weighted but randomly chosen damageType thats available and
+        # apply it to the enemy
+        for i in range(0, procCount):
+            damageType = rand.choices(damageTypes, weights = damageWeights, k=1)[0]
+            self.enemy.status.Status[damageType] += 1
+            if self.enemy.status.Status[damageType] > 10 and damageType != "Slash":
+                self.enemy.status.Status[damageType] = 10
+            #print(damageType+" proc issued!")
 
     # Calculates the damage of a single bullet
     # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor

@@ -25,5 +25,5 @@ class Status:
         count = 0
         for entry in self.DamageTypesInstance.Damage:
             if self.Status[entry] > 0:
-                count = count + 1
+                count += 1
         return count
