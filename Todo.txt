@@ -1,3 +1,8 @@
 - Apply Status Procs and Calcualte with them (i.e. Shotgun: First projectile applies Corrosive Proc -> all other projetiles shall make more damage then)
 - Maybe extract a list of weapons by Warframe.fandom? 
-- Take orange- and red crits in account
+- Static DamageTypes-class, so no instance needed for all classes/objects? (memory-efficiency)
+- Take Warframe Buffs into account
+- Take Arcanas into account
+- Make a cool GUI? :D
+- Take probability of crits into account rather than averageing it (random-library should be enough here. No need for crypto-stuff)
+

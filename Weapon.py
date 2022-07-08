@@ -12,27 +12,28 @@ class Weapon:
         self.UnmoddedDamage = 0
         self.BaseDamageMultiplier = 1 + mods.Multiplier["BaseDamage"]
         self.Quantum = 0
+        self.DamageTypesInstance = DamageTypes()
 
         # Set the base damage. The base-damage is needed to calculate additional damage, like "Toxin" on "Braton Prime" when using "Infected Clip"
         # https://warframe.fandom.com/wiki/Damage#Quantization
         # We need the UnmoddedDamage-Variable for calculating our Quantum
-        for entry in DamageTypes().Damage:
+        for entry in DamageTypesInstance.Damage:
             self.stats.Damage[entry] = baseStats.Damage[entry]
             self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
             self.UnmoddedDamage = self.UnmoddedDamage + baseStats.Damage[entry]
 
         # Add and sum toxin, slash and stuff (e.g. Calculating Toxin Damage for a weapon that got Toxin Damage through a mod, like "Infected Clip" on "Braton Prime")
-        for entry in DamageTypes().Damage:
+        for entry in DamageTypesInstance.Damage:
             self.stats.Damage[entry] = self.stats.Damage[entry] + (self.BaseDamage * mods.Multiplier[entry])
 
         # Take CC, CD and multiply with mods
-        for entry in DamageTypes().Additionals:
+        for entry in DamageTypesInstance.Additionals:
             if entry == "FactionDamage":
                 self.stats.Damage[entry] = round(baseStats.Damage[entry] + mods.Multiplier[entry], 1)
             else:
                 self.stats.Damage[entry] = round(baseStats.Damage[entry] * (1 + mods.Multiplier[entry]), 1)
 
-        for entry in DamageTypes().SpecialMods:
+        for entry in DamageTypesInstance.SpecialMods:
             self.stats.Damage[entry] = mods.Multiplier[entry]
 
     def GetQuantum(self, additionalDamageMultipliers: float):
@@ -44,10 +45,10 @@ class Weapon:
 
     def ShowStats(self, showProcs: bool):
         string = ""
-        for entry in DamageTypes().Multiplier:
+        for entry in DamageTypesInstance.Multiplier:
             if entry == "BaseDamage": # We just want to ignore that value. It doesn't show up in warframe either
                 continue
-            if entry in DamageTypes().Additionals:
+            if entry in DamageTypesInstance.Additionals:
                 string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry], 1)) + "\r\n"
             else:
                 string = string + "\t" + entry + ": " + str(round(self.stats.Damage[entry] * self.BaseDamageMultiplier, 1)) + "\r\n"
@@ -66,7 +67,7 @@ class Weapon:
 
     def CalculateProcs(self):
         probability = {}
-        for entry in DamageTypes().Damage:
+        for entry in DamageTypesInstance.Damage:
             if self.stats.Damage[entry] > 0:
                 probability[entry] = 0
 
