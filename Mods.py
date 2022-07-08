@@ -6,16 +6,17 @@ class Mods:
         self.Name = name
         self.Multiplier = {}
         self.DamageTypesInstance = DamageTypes()
-        for entry in DamageTypesInstance.Multiplier:
+        for entry in self.DamageTypesInstance.Multiplier:
             self.Multiplier[entry] = 0
 
-        for entry in DamageTypesInstance.SpecialMods:
+        for entry in self.DamageTypesInstance.SpecialMods:
             self.Multiplier[entry] = 0
 
     def loadMod(name: str):
         modParser = configparser.ConfigParser()
         modParser.read("Mods/" + name + ".ini")
         mods = Mods(name)
+        DamageTypesInstance = DamageTypes()
         for entry in DamageTypesInstance.Multiplier:
             mods.Multiplier[entry] = float(modParser["Mods"][entry])
             #print(entry+": " + str(mods.Multiplier[entry]))

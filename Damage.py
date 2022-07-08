@@ -8,7 +8,7 @@ class Damage:
         self.weapon = weapon
         self.enemy = enemy
         self.DamageResistanceInstance = DamageResistances()
-        self.DamageTypeInstance = DamageTypes()
+        self.DamageTypesInstance = DamageTypes()
 
     def DamageModifierArmor(self, type):
         # see https://warframe.fandom.com/wiki/Damage/Corrosive_Damage
@@ -92,10 +92,10 @@ class Damage:
         galvanizedStacks = 0 # from 0-3 or 0-2, depending on the mod/weapon
         galvanizedDamagePerStack = 0 #ranging from 0.03 - 0.4
         statusCount = self.enemy.GetStatusCount()
-        for galvanizedDmgPerStatus in DamageTypesInstance.GalvanizedDmgPerStatus:
+        for galvanizedDmgPerStatus in self.DamageTypesInstance.GalvanizedDmgPerStatus:
             if galvanizedDmgPerStatus in self.weapon.mods.Multiplier:
                 galvanizedStacks = self.weapon.mods.Multiplier[galvanizedDmgPerStatus]
-                galvanizedDamagePerStack = self.weapon.mods.Multiplier[DamageTypesInstance.DamagePerStack]
+                galvanizedDamagePerStack = self.weapon.mods.Multiplier[self.DamageTypesInstance.DamagePerStack]
                 additionalMultiplier = additionalMultiplier + (statusCount * galvanizedDamagePerStack * galvanizedStacks)
         return additionalMultiplier
 
@@ -104,7 +104,7 @@ class Damage:
     def CalculateSingleshot(self, function):
         self.singleDamage = {}
         self.totalDamage = 0
-        for entry in DamageTypesInstance.Damage:
+        for entry in self.DamageTypesInstance.Damage:
 
             # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
             self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry, self.GetAdditionalDamageMultipliers()) * function(entry)

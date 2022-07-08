@@ -5,7 +5,7 @@ class Stats:
     def __init__(self, name: str):
         self.Damage = {}
         self.DamageTypesInstance = DamageTypes()
-        for entry in DamageTypesInstance.Multiplier:
+        for entry in self.DamageTypesInstance.Multiplier:
             self.Damage[entry] = 0
 
         self.Name = name
@@ -14,7 +14,7 @@ class Stats:
         weaponParser = configparser.ConfigParser()
         weaponParser.read("Weapons/"+name+".ini")
         weaponStats = Stats(name)
-        for entry in DamageTypesInstance.Multiplier:
+        for entry in DamageTypes().Multiplier:
             if entry == "BaseDamage" or entry == "FactionDamage":
                 continue
             weaponStats.Damage[entry] = float(weaponParser["Weapon"][entry])

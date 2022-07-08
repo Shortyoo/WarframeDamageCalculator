@@ -12,6 +12,7 @@ class Status:
 
         statusParser = configparser.ConfigParser()
         statusParser.read("ActiveProcs/"+name+".ini")
+        DamageTypesInstance = DamageTypes()
 
         for entry in DamageTypesInstance.Damage:
             status[entry] = int(statusParser["StatusProcs"][entry])
@@ -22,7 +23,7 @@ class Status:
 
     def GetStatusCount(self):
         count = 0
-        for entry in DamageTypesInstance.Damage:
+        for entry in self.DamageTypesInstance.Damage:
             if self.Status[entry] > 0:
                 count = count + 1
         return count

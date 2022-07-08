@@ -1,6 +1,5 @@
 class DamageTypes:
     def __init__(self):
-
         self.BaseElementals = ["Cold", "Electricity", "Heat", "Toxin"]
         self.FusedElementals = ["Blast", "Corrosive", "Gas", "Magnetic", "Radiation"
         , "Viral"]
