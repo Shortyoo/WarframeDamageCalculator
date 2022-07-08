@@ -19,7 +19,7 @@ class Weapon:
         for entry in DamageTypes().Damage:
             self.stats.Damage[entry] = baseStats.Damage[entry]
             self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
-            self.UnmoddedDamage = self.UnmoddedDamage + (baseStats.Damage[entry] * self.BaseDamageMultiplier)
+            self.UnmoddedDamage = self.UnmoddedDamage + baseStats.Damage[entry]
 
         # Add and sum toxin, slash and stuff (e.g. Calculating Toxin Damage for a weapon that got Toxin Damage through a mod, like "Infected Clip" on "Braton Prime")
         for entry in DamageTypes().Damage:
@@ -35,11 +35,12 @@ class Weapon:
         for entry in DamageTypes().SpecialMods:
             self.stats.Damage[entry] = mods.Multiplier[entry]
 
-        self.Quantum = float(self.UnmoddedDamage / 16)
+    def GetQuantum(self, additionalDamageMultipliers: float):
+        return float(self.UnmoddedDamage * (self.BaseDamageMultiplier + additionalDamageMultipliers) / 16)
 
     # see https://warframe.fandom.com/wiki/Damage#Damage_Calculation
-    def QuantizedDamageType(self, type: str):
-        return round((self.stats.Damage[type] / self.Quantum) * self.BaseDamageMultiplier, 0) * self.Quantum
+    def QuantizedDamageType(self, type: str, additionalDamageMultipliers: float):
+        return round((self.stats.Damage[type] / self.GetQuantum(additionalDamageMultipliers)) * (self.BaseDamageMultiplier + additionalDamageMultipliers), 0) * self.GetQuantum(additionalDamageMultipliers)
 
     def ShowStats(self, showProcs: bool):
         string = ""

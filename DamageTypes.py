@@ -9,6 +9,8 @@ class DamageTypes:
         , "StatusChance", "Multishot", "FactionDamage", "FireRate", "MagSize"]
         self.SpecialMods = ["HunterMunition"]
 
+        self.GalvanizedDmgPerStatus = ["Galvanized Aptitude", "Galvanized Savvy", "Galvanized Shot", "Damage Per Stack"]
+
         self.Elementals = [] # BaseElementals + FusedElementals
         self.Damage = [] # Physical + Elementals
         self.Multiplier = [] # Damage + Additionals
@@ -30,3 +32,6 @@ class DamageTypes:
 
         for entry in self.Additionals:
             self.Multiplier.append(entry)
+
+        for entry in self.GalvanizedDmgPerStatus:
+            self.SpecialMods.append(entry)

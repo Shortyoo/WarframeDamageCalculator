@@ -18,10 +18,6 @@ class Damage:
         AR = armorValue
         AM = self.DamageResistanceInstance.GetMultiplier(type, self.enemy.armorType)
         HM = self.DamageResistanceInstance.GetMultiplier(type,self.enemy.healthType)
-        #print("AR: "+str(AR))
-        #print("AM: "+str(AM))
-        #print("HM: "+str(HM))
-        #print("Return: "+str( (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)))
 
         return (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)
 
@@ -74,7 +70,7 @@ class Damage:
                 # Toxin Damage bypasses "Shield" and "Proto Shield". So we want to deal diect damage to health with it:
                 # see https://warframe.fandom.com/wiki/Damage/Overview_Table#All_
                 if self.enemy.shieldType == "Proto Shield" or self.enemy.shieldType == "Shield":
-                    damageToHealth = round(self.weapon.QuantizedDamageType("Toxin") * self.DamageModifierArmor("Toxin"), 0)
+                    damageToHealth = round(self.weapon.QuantizedDamageType("Toxin", self.GetAdditionalDamageMultipliers()) * self.DamageModifierArmor("Toxin"), 0)
                     self.enemy.remainingHealth = self.enemy.remainingHealth - damageToHealth
                 (multishot, self.enemy.remainingShield) = self.SubtractDamage(damage, multishot, self.enemy.remainingShield)
                 if self.enemy.remainingShield < 0:
@@ -90,6 +86,18 @@ class Damage:
 
         print("It took: " + str(shots) + " shots to kill " + self.enemy.Name)
 
+    def GetAdditionalDamageMultipliers(self):
+        additionalMultiplier = 0
+        galvanizedStacks = 0 # from 0-3 or 0-2, depending on the mod/weapon
+        galvanizedDamagePerStack = 0 #
+        for galvanizedDmgPerStatus in DamageTypes().GalvanizedDmgPerStatus:
+            if galvanizedDmgPerStatus in self.weapon.mods.Multiplier:
+                galvanizedStacks = self.weapon.mods.Multiplier[galvanizedDmgPerStatus]
+                galvanizedDamagePerStack = self.weapon.mods.Multiplier["Damage Per Stack"]
+                statusCount = self.enemy.GetStatusCount()
+                additionalMultiplier = additionalMultiplier + (statusCount * galvanizedDamagePerStack * galvanizedStacks)
+        return additionalMultiplier
+
     # Calculates the damage of a single bullet
     # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor
     def CalculateSingleshot(self, function):
@@ -98,7 +106,7 @@ class Damage:
         for entry in DamageTypes().Damage:
 
             # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
-            self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry) * function(entry)
+            self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry, self.GetAdditionalDamageMultipliers()) * function(entry)
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
 
         # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
