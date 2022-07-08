@@ -54,7 +54,8 @@ else:
         #print("Quantum: " + str(entry.weapon.Quantum))
         #entry.ShootEnemy()
         dmg = entry.CalculateRawDamage()
-        print(entry.BuildString() + " Damage against Shield: {:,.2f}".format(dmg[0]))
+        if entry.enemy.shieldType != "None":
+            print(entry.BuildString() + " Damage against Shield: {:,.2f}".format(dmg[0]))
         print(entry.BuildString() + " Damage against Health: {:,.2f}".format(dmg[1]))
         firerate = entry.weapon.stats.Damage["FireRate"]
         magsize = entry.weapon.stats.Damage["MagSize"]
