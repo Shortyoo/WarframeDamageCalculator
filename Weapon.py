@@ -65,6 +65,12 @@ class Weapon:
 
         return string
 
+    def ModdedBaseDamage(self):
+        dmg = 0
+        for entry in self.DamageTypesInstance.Damage:
+            dmg += self.stats.Damage[entry]
+        return dmg
+
     def CalculateProcs(self):
         probability = {}
         for entry in DamageTypesInstance.Damage:
