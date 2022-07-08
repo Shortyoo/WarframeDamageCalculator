@@ -30,7 +30,11 @@ class Damage:
         critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
         # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
-        CritTier = 2 ** round(int(critChance / 100), 1)
+        # Crit Chance = 68% => 68/100 = 0 => 2^0 = 1
+        CritTier = 0
+        if critChance > 100:
+            CritTier = 2 ** int(critChance / 100)
+        CritTier += self.ProbabilityCheck(critChance * 10)
 
         CritTierMulti = 1 + CritTier * (critDamage - 1)
 
@@ -135,14 +139,14 @@ class Damage:
         self.singleDamage = {}
         self.totalDamage = 0
         for entry in self.DamageTypesInstance.Damage:
-
             # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
             self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry, self.GetAdditionalDamageMultipliers()) * function(entry)
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
 
         # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
-        self.totalDamage = self.totalDamage * self.GeneralDamageAmplifier()
-        return round(self.totalDamage, 0)
+        # Somehow, they say you have to calculate the crit chance for EACH damage type. But that's bs.
+        # Either every damagetype of a bullet crit or none. But not just a single one.
+        return round(self.totalDamage * self.GeneralDamageAmplifier(), 0)
 
     # Calculates the raw damage for Shield and Health (through armor)
     def CalculateRawDamage(self):
