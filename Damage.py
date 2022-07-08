@@ -51,40 +51,29 @@ class Damage:
 
         return (1 + damageTypeModifier + statusModifier)
 
-    # This method simulates the impact of the bullet to the enemy.
-    # So that's where our StatusProcs will be applied as well
-    def SubtractDamage(self, damage, multishot, attribute):
-        while multishot > 0 and attribute > 0:
-            attribute = attribute - damage
-            multishot = multishot - 1
-            self.ApplyStatusProcs()
-        # Maybe we have Multishot 12.2, we calculated 12 rounds but I want to consider that leftover 0.2 as well with that exact weight of 0.2
-        if multishot < 1 and attribute > 0:
-            attribute = attribute - (damage * multishot)
-
-        return(multishot, attribute)
-
     def ShootEnemy(self):
         shots = 0
         while self.enemy.remainingHealth > 0:
             shots = shots + 1
             multishot = self.weapon.stats.Damage["Multishot"]
-            # Destroy shield before attacking Health
-            if self.enemy.remainingShield > 0:
-                damage = self.CalculateSingleshot(self.DamageModifierShield)
-                # Toxin Damage bypasses "Shield" and "Proto Shield". So we want to deal diect damage to health with it:
-                # see https://warframe.fandom.com/wiki/Damage/Overview_Table#All_
-                if self.enemy.shieldType == "Proto Shield" or self.enemy.shieldType == "Shield":
-                    damageToHealth = round(self.weapon.QuantizedDamageType("Toxin", self.GetAdditionalDamageMultipliers()) * self.DamageModifierArmor("Toxin"), 0)
-                    self.enemy.remainingHealth = self.enemy.remainingHealth - damageToHealth
-                (multishot, self.enemy.remainingShield) = self.SubtractDamage(damage, multishot, self.enemy.remainingShield)
-                if self.enemy.remainingShield < 0:
+
+            while multishot >= 1:
+                # Destroy shield before attacking Health
+                if self.enemy.remainingShield > 0:
+                    damage = self.CalculateSingleshot(self.DamageModifierShield)
+                    # Toxin Damage bypasses "Shield" and "Proto Shield". So we want to deal diect damage to health with it:
+                    # see https://warframe.fandom.com/wiki/Damage/Overview_Table#All_
+                    if self.enemy.shieldType == "Proto Shield" or self.enemy.shieldType == "Shield":
+                        damageToHealth = round(self.weapon.QuantizedDamageType("Toxin", self.GetAdditionalDamageMultipliers()) * self.DamageModifierArmor("Toxin"), 0)
+                        self.enemy.remainingHealth = self.enemy.remainingHealth - damageToHealth
+                    self.enemy.remainingShield -= damage
+                # Damage to Health
+                else:
                     damage = self.CalculateSingleshot(self.DamageModifierArmor)
-                    (multishot, self.enemy.remainingHealth) = self.SubtractDamage(damage, multishot, self.enemy.remainingHealth)
-            # Damage to Health
-            else:
-                damage = self.CalculateSingleshot(self.DamageModifierArmor)
-                (multishot, self.enemy.remainingHealth) = self.SubtractDamage(damage, multishot, self.enemy.remainingHealth)
+                    self.enemy.remainingHealth -= damage
+
+                self.ApplyStatusProcs()
+                multishot -= 1
 
         self.enemy.remainingHealth = self.enemy.health
         self.enemy.remainingShield = self.enemy.remainingShield
@@ -96,7 +85,7 @@ class Damage:
         galvanizedStacks = 0 # from 0-3 or 0-2, depending on the mod/weapon
         galvanizedDamagePerStack = 0 #ranging from 0.03 - 0.4
         statusCount = self.enemy.GetStatusCount()
-        
+
         for galvanizedMod in self.DamageTypesInstance.GalvanizedMods:
             if self.weapon.mods.Multiplier[galvanizedMod] > 0:
                 galvanizedDamagePerStack = self.weapon.mods.Multiplier[self.DamageTypesInstance.DamagePerStack]
