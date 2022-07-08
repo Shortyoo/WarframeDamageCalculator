@@ -49,3 +49,6 @@ class Enemy:
             armor = armor * 2.5
 
         return Enemy(health, shield, armor, name+ " : Level "+str(level), healthType, shieldType, armorType, status)
+
+    def GetStatusCount(self):
+        return self.status.GetStatusCount()

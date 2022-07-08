@@ -18,4 +18,9 @@ class Mods:
         for entry in DamageTypes().Multiplier:
             mods.Multiplier[entry] = float(modParser["Mods"][entry])
             #print(entry+": " + str(mods.Multiplier[entry]))
+
+        for entry in DamageTypes().SpecialMods:
+            if entry in modParser["Mods"]:
+                mods.Multiplier[entry] = float(modParser["Mods"][entry])
+
         return mods

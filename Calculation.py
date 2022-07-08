@@ -52,7 +52,7 @@ else:
 
     for entry in damage:
         #print("Quantum: " + str(entry.weapon.Quantum))
-        #entry.ShootEnemy()
+        entry.ShootEnemy()
         dmg = entry.CalculateRawDamage()
         if entry.enemy.shieldType != "None":
             print(entry.BuildString() + " Damage against Shield: {:,.2f}".format(dmg[0]))
