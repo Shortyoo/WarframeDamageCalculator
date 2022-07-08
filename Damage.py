@@ -97,6 +97,7 @@ class Damage:
                 galvanizedDamagePerStack = self.weapon.mods.Multiplier[self.DamageTypesInstance.DamagePerStack]
                 galvanizedStacks = self.weapon.mods.Multiplier[galvanizedMod]
                 additionalMultiplier = additionalMultiplier + (statusCount * galvanizedDamagePerStack * galvanizedStacks)
+                break # There can be just one galvanized mod. No need to look for other ones
         return additionalMultiplier
 
     # Calculates the damage of a single bullet
