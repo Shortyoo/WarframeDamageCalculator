@@ -34,7 +34,7 @@ class Damage:
         CritTier = 0
         if critChance > 100:
             CritTier = 2 ** int(critChance / 100)
-        CritTier += self.ProbabilityCheck(critChance * 10)
+        CritTier += self.ProbabilityCheck(critChance)
 
         CritTierMulti = 1 + CritTier * (critDamage - 1)
 
@@ -100,10 +100,13 @@ class Damage:
         return additionalMultiplier
 
     # Calculatates whether we're lucky to get an additional status/crit/multishot etc
+    # The passed value is multilpied 10 for the following reason:
+    # Suppose we have a 20.2% Crit-Chance. We dont want to miss out on those 0.2%! So we increase it to
+    # 202, and adjust our randint ranging from 1,1000 instead of 1,100
     def ProbabilityCheck(self, valueToCompareWith: int):
         rand = random.Random()
         randValue = rand.randint(1,1000)
-        if randValue <= valueToCompareWith:
+        if randValue <= (valueToCompareWith * 10):
             return 1
         return 0
 
@@ -111,7 +114,6 @@ class Damage:
         statusChance = self.weapon.stats.Damage["StatusChance"]
         guaranteedProcs = int(statusChance / 100) # i.e. Status Chance is 120%, we will have 1 guaranteed proc
         probabilityForAdditionalProc = statusChance - (guaranteedProcs*100) # subtract the guaranteedProcs
-        probabilityToCompareWith = probabilityForAdditionalProc*10 # i.e. Status chance is 20.2%. We dont wanna miss those 0.2% when asking for a rand INT!
         # Calculate which procs can occur which their %-chance
         procProbability = self.weapon.CalculateProcs()
         damageTypes = []
@@ -121,7 +123,7 @@ class Damage:
             damageTypes.append(entry)
             damageWeights.append(procProbability[entry])
 
-        procCount = guaranteedProcs + self.ProbabilityCheck(probabilityToCompareWith)
+        procCount = guaranteedProcs + self.ProbabilityCheck(probabilityForAdditionalProc)
 
         # choose a weighted but randomly chosen damageType thats available and
         # apply it to the enemy
