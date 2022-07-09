@@ -3,4 +3,6 @@
 - Take Warframe Buffs into account
 - Take Arcanas into account
 - Make a cool GUI? :D
-- Take probability of crits into account rather than averageing it (random-library should be enough here. No need for crypto-stuff)
+- Radial Attack
+- DoT procs
+- Max status-stacks on bosses (i.e. an Acolyte can take 4 stacks of 1 status at a time, rather than a normal enemy can have 200 slash procs whilst using Hunter Munition)
