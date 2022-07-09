@@ -47,7 +47,6 @@ class Damage:
 
         # CritChance 180% -> get those 80%
         critChance -= int(critChance/100)*100
-        print(critChance)
 
         CritTier = GuaranteedCritTier + self.ProbabilityCheck(critChance)
 
