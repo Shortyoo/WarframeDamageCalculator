@@ -19,7 +19,8 @@ class Weapon:
         # We need the UnmoddedDamage-Variable for calculating our Quantum
         for entry in self.DamageTypesInstance.Damage:
             self.stats.Damage[entry] = baseStats.Damage[entry]
-            self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],0)
+            # Important: Keep that round to 1 decimals! Otherwise additional elementals, like Toxin, won't be calculated correctly!!
+            self.BaseDamage = self.BaseDamage + round(baseStats.Damage[entry],1)
             self.UnmoddedDamage = self.UnmoddedDamage + baseStats.Damage[entry]
 
         # Add and sum toxin, slash and stuff (e.g. Calculating Toxin Damage for a weapon that got Toxin Damage through a mod, like "Infected Clip" on "Braton Prime")
