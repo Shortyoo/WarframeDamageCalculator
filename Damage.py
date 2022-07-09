@@ -23,6 +23,18 @@ class Damage:
 
         return (300 / (300 + AR * (1 - AM))) * (1 + AM) * (1 + HM)
 
+    def CalculateGuaranteedCritTier(self):
+        critChance = self.weapon.stats.Damage["CritChance"]
+        critDamage = self.weapon.stats.Damage["CritDamage"]
+        # Example:
+        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
+        # Crit Chance = 68% => 68/100 = 0 => 2^0 = 1
+        GuaranteedCritTier = 0
+        if critChance > 100:
+            GuaranteedCritTier = 2 ** int(critChance / 100)
+
+        return GuaranteedCritTier
+
     # see https://warframe.fandom.com/wiki/Critical_Hit#Crit_Tiers
     def CalculateCritMultiplier(self):
         critDmg = 1
@@ -31,10 +43,13 @@ class Damage:
         # Example:
         # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
         # Crit Chance = 68% => 68/100 = 0 => 2^0 = 1
-        CritTier = 0
-        if critChance > 100:
-            CritTier = 2 ** int(critChance / 100)
-        CritTier += self.ProbabilityCheck(critChance)
+        GuaranteedCritTier = self.CalculateGuaranteedCritTier()
+
+        # CritChance 180% -> get those 80%
+        critChance -= int(critChance/100)*100
+        print(critChance)
+
+        CritTier = GuaranteedCritTier + self.ProbabilityCheck(critChance)
 
         CritTierMulti = 1 + CritTier * (critDamage - 1)
 
