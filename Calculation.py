@@ -53,19 +53,8 @@ else:
     for entry in damage:
         #print("Quantum: " + str(entry.weapon.Quantum))
         entry.ShootEnemy()
-        dmg = entry.CalculateRawDamage()
-        if entry.enemy.shieldType != "None":
-            print(entry.BuildString() + " Damage against Shield: {:,.2f}".format(dmg[0]))
-        print(entry.BuildString() + " Damage against Health: {:,.2f}".format(dmg[1]))
-        firerate = entry.weapon.stats.Damage["FireRate"]
-        magsize = entry.weapon.stats.Damage["MagSize"]
-        DPS = magsize / firerate
-        # If DPS < 1, means that we cant even fire for 1 second.
-        # DPS > 1 means we could fire for more than 1 sec, but we want the exact value for 1 sec
-        if DPS > 1:
-            DPS = entry.weapon.stats.Damage["FireRate"]
+        entry.PrintRawDamage()
 
-        print(entry.BuildString() + " DPS: {:,.2f}".format(entry.CalculateRawDamageMultiShot() * DPS))
         if args.slash:
             tickDamage = float(entry.CalculateSlashDamage())
             print(entry.weapon.Name + "Slash Damage per Tick: " + str(tickDamage))
