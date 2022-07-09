@@ -3,7 +3,9 @@ import configparser
 
 class Status:
     def __init__(self, status):
-        self.Status = status
+        self.Status = {}
+        for entry in status.keys():
+            self.Status[entry] = status[entry]
         self.DamageTypesInstance = DamageTypes()
 
     def loadStatus(name: str):

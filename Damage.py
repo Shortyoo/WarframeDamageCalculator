@@ -2,6 +2,7 @@ from Weapon import Weapon
 from DamageTypes import DamageTypes
 from Enemy import Enemy
 from DamageResistances import DamageResistances
+from Status import Status
 import random
 
 class Damage:
@@ -68,6 +69,7 @@ class Damage:
 
     def ShootEnemy(self):
         shots = 0
+        enemyOldStatus = Status(self.enemy.status.Status)
         while self.enemy.remainingHealth > 0:
             shots = shots + 1
             multishot = self.weapon.stats.Damage["Multishot"]
@@ -92,7 +94,8 @@ class Damage:
 
         self.enemy.remainingHealth = self.enemy.health
         self.enemy.remainingShield = self.enemy.remainingShield
-
+        # reset if we want to call "ShootEnemy" again
+        self.enemy.status = enemyOldStatus
         print("It took: " + str(shots) + " shots to kill " + self.enemy.Name)
 
     def GetAdditionalDamageMultipliers(self):
@@ -194,17 +197,31 @@ class Damage:
         critDamage = self.weapon.stats.Damage["CritDamage"]
         guaranteedCrits = round((critChance+49.9)/100,0)
         CritMulti = 1 + guaranteedCrits * (critDamage - 1)
-        #CritTier = 2 **
+        enemyFormerStatus = Status(self.enemy.status.Status)
+        enemyModifiedStatus = Status(self.enemy.status.Status)
+        # Add a status proc for every damage type occuring
+        for entry in self.DamageTypesInstance.Damage:
+            if self.weapon.stats.Damage[entry] > 0:
+                if entry != "Slash":
+                    enemyModifiedStatus.Status[entry] = 10
+                else:
+                    enemyModifiedStatus.Status[entry] += 1
+
         if self.enemy.shieldType != "None":
+            self.enemy.status = enemyFormerStatus
             shieldMinDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierShield), 0)
-            shieldMaxDamage = shieldMinDamage * CritMulti
+            self.enemy.status = enemyModifiedStatus
+            shieldMaxDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierShield), 0) * CritMulti
             shieldAvgDamage = shieldMinDamage * ((critChance/100) * critDamage)
             shieldMinMaxAvgDamage = (shieldMinDamage, shieldMaxDamage, shieldAvgDamage)
 
+        self.enemy.status = enemyFormerStatus
         armorMinDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierArmor), 0)
-        armorMaxDamage = armorMinDamage * CritMulti
+        self.enemy.status = enemyModifiedStatus
+        armorMaxDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierShield), 0) * CritMulti
         armorAvgDamage = armorMinDamage * ((critChance/100) * critDamage)
         armorMinMaxAvgDamage = (armorMinDamage, armorMaxDamage, armorAvgDamage)
+        self.enemy.status = enemyFormerStatus
         return (shieldMinMaxAvgDamage, armorMinMaxAvgDamage)
 
     # Just mulitplies the RawDamage with the Multishot-Value
