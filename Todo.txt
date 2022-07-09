@@ -1,3 +1,8 @@
-- Apply Status Procs and Calcualte with them (i.e. Shotgun: First projectile applies Corrosive Proc -> all other projetiles shall make more damage then)
 - Maybe extract a list of weapons by Warframe.fandom? 
-- Take orange- and red crits in account
+- Static DamageTypes-class, so no instance needed for all classes/objects? (memory-efficiency)
+- Take Warframe Buffs into account
+- Take Arcanas into account
+- Make a cool GUI? :D
+- Radial Attack
+- DoT procs
+- Max status-stacks on bosses (i.e. an Acolyte can take 4 stacks of 1 status at a time, rather than a normal enemy can have 200 slash procs whilst using Hunter Munition)

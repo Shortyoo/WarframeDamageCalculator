@@ -1,6 +1,5 @@
 class DamageTypes:
     def __init__(self):
-
         self.BaseElementals = ["Cold", "Electricity", "Heat", "Toxin"]
         self.FusedElementals = ["Blast", "Corrosive", "Gas", "Magnetic", "Radiation"
         , "Viral"]
@@ -8,6 +7,9 @@ class DamageTypes:
         self.Additionals = ["BaseDamage", "CritChance", "CritDamage"
         , "StatusChance", "Multishot", "FactionDamage", "FireRate", "MagSize"]
         self.SpecialMods = ["HunterMunition"]
+
+        self.GalvanizedMods = ["Galvanized Aptitude", "Galvanized Savvy", "Galvanized Shot"]
+        self.DamagePerStack = "Damage Per Stack"
 
         self.Elementals = [] # BaseElementals + FusedElementals
         self.Damage = [] # Physical + Elementals
@@ -30,3 +32,6 @@ class DamageTypes:
 
         for entry in self.Additionals:
             self.Multiplier.append(entry)
+
+        for entry in self.GalvanizedMods:
+            self.SpecialMods.append(entry)
