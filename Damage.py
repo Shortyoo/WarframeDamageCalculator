@@ -39,7 +39,7 @@ class Damage:
         critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
         # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're definitely in yellow crit here
-        # Crit Chance = 68% => 68/100 = 0. 
+        # Crit Chance = 68% => 68/100 = 0.
         GuaranteedCritTier = self.CalculateGuaranteedCritTier()
 
         # CritChance 180% -> get those 80%
@@ -146,26 +146,66 @@ class Damage:
                 self.enemy.status.Status[damageType] = 10
             #print(damageType+" proc issued!")
 
-    # Calculates the damage of a single bullet
+    # Calculates the damage of a single bullet without taking crits into account
     # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor
-    def CalculateSingleshot(self, function):
+    def CalculateSingleshotWithoutCrit(self, function):
         self.singleDamage = {}
         self.totalDamage = 0
         for entry in self.DamageTypesInstance.Damage:
             # https://warframe.fandom.com/wiki/Damage#Total_Damage explains Quantiziation
             self.singleDamage[entry] = self.weapon.QuantizedDamageType(entry, self.GetAdditionalDamageMultipliers()) * function(entry)
             self.totalDamage = self.totalDamage + self.singleDamage[entry]
+        return self.totalDamage
 
+    # Calculates the damage of a single bullet WITH takin crits into account
+    # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor
+    def CalculateSingleshot(self, function):
         # https://warframe.fandom.com/wiki/Damage#Generalized_Damage_Modifier explains * self.GeneralDamageAmplifier()
         # Somehow, they say you have to calculate the crit chance for EACH damage type. But that's bs.
         # Either every damagetype of a bullet crit or none. But not just a single one.
-        return round(self.totalDamage * self.GeneralDamageAmplifier(), 0)
+        return round(self.CalculateSingleshotWithoutCrit(function) * self.GeneralDamageAmplifier(), 0)
+
+    def PrintRawDamage(self):
+        dmg = self.CalculateRawDamage()
+
+        firerate = self.weapon.stats.Damage["FireRate"]
+        magsize = self.weapon.stats.Damage["MagSize"]
+        DPS = magsize / firerate
+        # If DPS < 1, means that we cant even fire for 1 second.
+        # DPS > 1 means we could fire for more than 1 sec, but we want the exact value for 1 sec
+        if DPS > 1:
+            DPS = self.weapon.stats.Damage["FireRate"]
+
+        if self.enemy.shieldType != "None":
+            print(self.BuildString() + " Min-Damage against Shield: {:,.2f}".format(dmg[0][0]))
+            print(self.BuildString() + " Max-Damage against Shield: {:,.2f}".format(dmg[0][1]))
+            print(self.BuildString() + " Average-Damage against Shield: {:,.2f}".format(dmg[0][2]))
+            print(self.BuildString() + " Average-DPS against Shield: {:,.2f}".format(dmg[0][2] * DPS))
+        print(self.BuildString() + " Min-Damage against Health: {:,.2f}".format(dmg[1][0]))
+        print(self.BuildString() + " Max-Damage against Health: {:,.2f}".format(dmg[1][1]))
+        print(self.BuildString() + " Average-Damage against Health: {:,.2f}".format(dmg[1][2]))
+        print(self.BuildString() + " Average-DPS against Health: {:,.2f}".format(dmg[1][2] * DPS))
 
     # Calculates the raw damage for Shield and Health (through armor)
     def CalculateRawDamage(self):
+        shieldMinMaxAvgDamage = (0,0,0)
+        armorMinMaxAvgDamage = (0,0,0)
+        critChance = self.weapon.stats.Damage["CritChance"]
+        critDamage = self.weapon.stats.Damage["CritDamage"]
+        guaranteedCrits = round((critChance+49.9)/100,0)
+        CritMulti = 1 + guaranteedCrits * (critDamage - 1)
+        #CritTier = 2 **
         if self.enemy.shieldType != "None":
-            return (self.CalculateSingleshot(self.DamageModifierShield), self.CalculateSingleshot(self.DamageModifierArmor))
-        return (0, self.CalculateSingleshot(self.DamageModifierArmor))
+            shieldMinDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierShield), 0)
+            shieldMaxDamage = shieldMinDamage * CritMulti
+            shieldAvgDamage = shieldMinDamage * ((critChance/100) * critDamage)
+            shieldMinMaxAvgDamage = (shieldMinDamage, shieldMaxDamage, shieldAvgDamage)
+
+        armorMinDamage = round(self.CalculateSingleshotWithoutCrit(self.DamageModifierArmor), 0)
+        armorMaxDamage = armorMinDamage * CritMulti
+        armorAvgDamage = armorMinDamage * ((critChance/100) * critDamage)
+        armorMinMaxAvgDamage = (armorMinDamage, armorMaxDamage, armorAvgDamage)
+        return (shieldMinMaxAvgDamage, armorMinMaxAvgDamage)
 
     # Just mulitplies the RawDamage with the Multishot-Value
     def CalculateRawDamageMultiShot(self):
