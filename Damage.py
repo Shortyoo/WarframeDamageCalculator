@@ -27,12 +27,9 @@ class Damage:
         critChance = self.weapon.stats.Damage["CritChance"]
         critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
-        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
-        # Crit Chance = 68% => 68/100 = 0 => 2^0 = 1
-        GuaranteedCritTier = 0
-        if critChance > 100:
-            GuaranteedCritTier = 2 ** int(critChance / 100)
-
+        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in yellow crit here
+        # Crit Chance = 68% => 68/100 = 0 => No guaranteed crit
+        GuaranteedCritTier = int(critChance / 100)
         return GuaranteedCritTier
 
     # see https://warframe.fandom.com/wiki/Critical_Hit#Crit_Tiers
@@ -41,8 +38,8 @@ class Damage:
         critChance = self.weapon.stats.Damage["CritChance"]
         critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
-        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in orange crit here
-        # Crit Chance = 68% => 68/100 = 0 => 2^0 = 1
+        # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're definitely in yellow crit here
+        # Crit Chance = 68% => 68/100 = 0. 
         GuaranteedCritTier = self.CalculateGuaranteedCritTier()
 
         # CritChance 180% -> get those 80%
