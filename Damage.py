@@ -26,7 +26,6 @@ class Damage:
 
     def CalculateGuaranteedCritTier(self):
         critChance = self.weapon.stats.Damage["CritChance"]
-        critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
         # CritChance = 180%. 180 / 100 = 1.8 => 1. So we're in yellow crit here
         # Crit Chance = 68% => 68/100 = 0 => No guaranteed crit
@@ -35,7 +34,6 @@ class Damage:
 
     # see https://warframe.fandom.com/wiki/Critical_Hit#Crit_Tiers
     def CalculateCritMultiplier(self):
-        critDmg = 1
         critChance = self.weapon.stats.Damage["CritChance"]
         critDamage = self.weapon.stats.Damage["CritDamage"]
         # Example:
@@ -251,7 +249,6 @@ class Damage:
         return armorReduction
 
     def CalculateSlashDamage(self):
-        headshot = 1 # we aim for the head
         slashDamagePerTick = 0.35 * self.weapon.stats.Damage["Slash"] * self.GeneralDamageAmplifier() * (1 + self.DamageResistances.GetMutliplier("Slash", self.enemy.armorType))
 
         slashDamagePerTickTimesSlashProcs = slashDamagePerTick
