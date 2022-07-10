@@ -149,6 +149,8 @@ class Damage:
                 self.enemy.status.Status[damageType] = 10
             #print(damageType+" proc issued!")
 
+        self.enemy.ValidateProcs()
+
     # Calculates the damage of a single bullet without taking crits into account
     # function: A function to calculate the DamageModifier, i.e. DamageModifierShield or DamageModifierArmor
     def CalculateSingleshotWithoutCrit(self, function):

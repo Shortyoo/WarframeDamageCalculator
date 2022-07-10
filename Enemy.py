@@ -14,6 +14,7 @@ class Enemy:
         self.remainingHealth = float(health)
         self.remainingShield = float(shield)
         self.status = status
+        self.ValidateProcs()
 
         #print("Remaining Shield: " + str(self.remainingShield))
         #print("Armor: " + str(self.Armor))
@@ -48,7 +49,16 @@ class Enemy:
             shield = shield * 2.5
             armor = armor * 2.5
 
-        return Enemy(health, shield, armor, name+ " : Level "+str(level), healthType, shieldType, armorType, status)
+        return Enemy(health, shield, armor, name+ ": Level "+str(level), healthType, shieldType, armorType, status)
+
+    def ValidateProcs(self):
+        maxProcs = 10
+        if self.Name.find("Acolyte") != -1:
+            maxProcs = 4
+
+        for entry in DamageTypes().Damage:
+            if self.status.Status[entry] > maxProcs:
+                self.status.Status[entry] = maxProcs
 
     def GetStatusCount(self):
         return self.status.GetStatusCount()
