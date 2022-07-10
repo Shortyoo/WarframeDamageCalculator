@@ -53,12 +53,15 @@ class Enemy:
 
     def ValidateProcs(self):
         maxProcs = 10
+        resetSlash = False
         if self.Name.find("Acolyte") != -1:
             maxProcs = 4
+            resetSlash = True
 
         for entry in DamageTypes().Damage:
-            if self.status.Status[entry] > maxProcs:
+            if (entry != "Slash" or resetSlash) and self.status.Status[entry] > maxProcs:
                 self.status.Status[entry] = maxProcs
+
 
     def GetStatusCount(self):
         return self.status.GetStatusCount()

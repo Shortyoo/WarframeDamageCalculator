@@ -143,8 +143,6 @@ class Damage:
         for i in range(0, procCount):
             damageType = rand.choices(damageTypes, weights = damageWeights, k=1)[0]
             self.enemy.status.Status[damageType] += 1
-            if self.enemy.status.Status[damageType] > 10 and damageType != "Slash":
-                self.enemy.status.Status[damageType] = 10
             #print(damageType+" proc issued!")
 
         self.enemy.ValidateProcs()
