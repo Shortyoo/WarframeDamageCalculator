@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-sS", "--showStats", help="Shows the stat of each weapon after calculation", action="store_true")
 parser.add_argument("-s", "--slash", help ="Calculates the damage of all slash procs", action="store_true")
 parser.add_argument("-sP", "--showProcs", help ="Calculates the probability to apply a proc on the opponent", action="store_true")
+parser.add_argument("-sE", "--shootEnemy", help="Calculates the amount of bullets you have to shoot until the enemy dies (WARNING: if you use No mods, this could take a while!)", action="store_true")
 args = parser.parse_args()
 
 weaponStatList = []
@@ -52,7 +53,8 @@ else:
 
     for entry in damage:
         #print("Quantum: " + str(entry.weapon.Quantum))
-        entry.ShootEnemy()
+        if args.shootEnemy:
+            entry.ShootEnemy()
         entry.PrintRawDamage()
 
         if args.slash:
